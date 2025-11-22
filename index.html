@@ -1,330 +1,203 @@
-<!--
-  WorkerHire - Single-file marketplace (HTML/CSS/JS)
-  - Save as index.html and open in browser (works offline)
-  - Data is stored locally in localStorage (no backend)
-  - Features added in this version:
-      * Upload worker photo (stored as data URL)
-      * Edit and Delete worker profiles
-      * Improved UI hints
-  - To go live: host on GitHub Pages (push this file to a repo and enable Pages)
--->
 <!doctype html>
 <html lang="hi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WorkerHire — Find & Book Local Helpers</title>
+  <title>WorkerHire — Premium</title>
   <style>
-    :root{--accent:#2563eb;--muted:#6b7280;--card:#ffffff;--bg:#f3f4f6}
-    *{box-sizing:border-box}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0;background:var(--bg);color:#111}
-    header{background:linear-gradient(90deg,var(--accent),#7c3aed);color:white;padding:18px 20px}
-    .container{max-width:1000px;margin:18px auto;padding:0 16px}
+    :root{--accent:#2563eb;--bg:#f7fbff;--card:#fff;--muted:#6b7280}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans","Helvetica Neue",Arial}
+    body{margin:0;background:linear-gradient(180deg,#eef6ff 0%,#fff 100%);color:#111}
+    header{background:linear-gradient(90deg, #1e3a8a, #2563eb);color:#fff;padding:24px 20px}
     h1{margin:0;font-size:20px}
-    .top{display:flex;gap:12px;align-items:center;justify-content:space-between}
-    .controls{display:flex;gap:8px;align-items:center}
-    input[type=text],select,input[type=number],input[type=datetime-local],textarea{padding:8px;border-radius:8px;border:1px solid #e5e7eb}
-    button{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer}
-    main{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
-    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 1px 4px rgba(2,6,23,0.06)}
-    .list{display:grid;gap:12px}
-    .worker{display:flex;gap:12px;padding:10px;border:1px solid #eef2ff;border-radius:10px;align-items:center}
-    .avatar{width:64px;height:64px;border-radius:8px;background:linear-gradient(135deg,#efefef,#ddd);display:flex;align-items:center;justify-content:center;font-weight:700;color:#444;overflow:hidden}
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .meta{flex:1}
-    .meta h3{margin:0;font-size:16px}
-    .meta p{margin:4px 0;color:var(--muted);font-size:13px}
-    .meta .tags{display:flex;gap:6px;flex-wrap:wrap}
-    .tag{background:#eef2ff;padding:4px 8px;border-radius:999px;font-size:12px;color:#2563eb}
-    .rate{font-weight:700}
-    .small{font-size:13px;color:var(--muted)}
-    .sidebar .section{margin-bottom:12px}
-    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-    form .row{display:flex;gap:8px}
-    textarea{width:100%;min-height:64px;padding:8px;border-radius:8px;border:1px solid #e5e7eb}
-    .book-btn{background:#10b981}
-    .muted{color:var(--muted);font-size:13px}
-    footer{max-width:1000px;margin:18px auto;padding:10px 16px;color:var(--muted);font-size:13px}
-    .actions button{background:#f59e0b}
-    .danger{background:#ef4444}
-    @media(max-width:880px){main{grid-template-columns:1fr} .sidebar{order:2}}
+    .container{max-width:920px;margin:24px auto;padding:0 16px}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06);margin-bottom:16px}
+    label{display:block;font-weight:600;margin-bottom:8px}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6edf8;background:#fbfdff}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    button{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+    .muted{color:var(--muted);font-size:14px}
+    .worker-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .worker{padding:12px;border-radius:10px;border:1px solid #eef3ff;background:#fff}
+    footer{padding:24px;text-align:center;color:var(--muted)}
   </style>
 </head>
 <body>
   <header>
-    <div class="container top">
-      <div>
-        <h1>WorkerHire</h1>
-        <div style="font-size:13px;opacity:0.95">लोकल वर्कर्स ढूंढो और घंटे के हिसाब से बुक करो — बिलकुल फ्री</div>
-      </div>
-      <div class="controls">
-        <input id="searchInput" type="text" placeholder="नाम या सेवा से खोजें" />
-        <select id="categoryFilter">
-          <option value="">सभी कैटेगरी</option>
-          <option>Plumber</option>
-          <option>Carpenter</option>
-          <option>Housemaid</option>
-          <option>Electrician</option>
-          <option>Cleaner</option>
-          <option>Painter</option>
-        </select>
-        <button id="clearStorage">डेटा हटाओ</button>
-      </div>
-    </div>
+    <h1>WorkerHire — Premium</h1>
+    <div class="muted">Local demo — backend should be on same origin (or set BACKEND_URL in code)</div>
   </header>
 
-  <main class="container">
-    <section>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h2 style="margin:0;font-size:16px">Available Workers</h2>
-          <div class="small">Showing <span id="count">0</span> profiles</div>
+  <div class="container">
+    <div class="card">
+      <h3>Available Workers</h3>
+      <div id="workers" class="worker-list">
+        <!-- JS will render -->
+      </div>
+      <div class="muted" style="margin-top:8px">Add sample worker or create your own profile.</div>
+    </div>
+
+    <div class="card">
+      <h3>Add Worker (Demo)</h3>
+      <div style="margin-bottom:8px">
+        <label>Name</label>
+        <input id="wname" placeholder="Ram, Suresh..." />
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <div class="col">
+          <label>Category</label>
+          <select id="wcat">
+            <option>Plumber</option>
+            <option>Carpenter</option>
+            <option>Housemaid</option>
+            <option>Electrician</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Rate per hour (₹)</label>
+          <input id="wrate" placeholder="e.g. 200" type="number"/>
         </div>
       </div>
-
-      <div class="list" id="workersList" style="margin-top:12px"></div>
-
-      <div class="card" style="margin-top:12px">
-        <h3 style="margin-top:0">Your Bookings</h3>
-        <div id="bookingsList" class="small"></div>
+      <label>Short description</label>
+      <textarea id="wdesc" rows="2" placeholder="Experience and skills..."></textarea>
+      <div style="margin-top:10px">
+        <button id="addWorker">Add Worker</button>
+        <button id="loadSample" style="margin-left:8px;background:#0ea5a4">Load sample</button>
       </div>
-    </section>
+    </div>
 
-    <aside class="sidebar">
-      <div class="card sidebar card-small">
-        <div class="section">
-          <h3 style="margin:0" id="formTitle">Add a Worker</h3>
-          <p class="small">वर्कर का प्रोफ़ाइल जोड़ें — फोटो भी डाल सकते हैं</p>
-          <form id="addWorkerForm">
-            <input id="wId" type="hidden" />
-            <label>Name</label>
-            <input id="wName" type="text" required />
-            <label>Category</label>
-            <select id="wCategory" required>
-              <option>Plumber</option>
-              <option>Carpenter</option>
-              <option>Housemaid</option>
-              <option>Electrician</option>
-              <option>Cleaner</option>
-              <option>Painter</option>
-            </select>
-            <label>Rate per hour (₹)</label>
-            <input id="wRate" type="number" placeholder="e.g. 200" required />
-            <label>Short description</label>
-            <textarea id="wDesc" placeholder="Few words about skills or experience"></textarea>
-            <label>Photo (optional)</label>
-            <input id="wPhoto" type="file" accept="image/*" />
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button type="submit" id="addBtn">Add Worker</button>
-              <button type="button" id="seedBtn">Load sample</button>
-              <button type="button" id="cancelEdit" style="display:none;background:#6b7280">Cancel</button>
-            </div>
-          </form>
-        </div>
+    <div class="card">
+      <h3>Book a Worker (Quick)</h3>
+      <div style="margin-bottom:10px">
+        <label>Select Worker</label>
+        <select id="selectWorker"></select>
       </div>
-
-      <div class="card sidebar" style="margin-top:12px">
-        <h3 style="margin:0">Book a Worker (Quick)</h3>
-        <p class="small">किसी वर्कर पर Book दबाएँ, फॉर्म भरें और Confirm करें</p>
-        <div id="quickBookArea" class="small" style="margin-top:8px">No worker selected</div>
-      </div>
-
-      <div class="card sidebar" style="margin-top:12px">
-        <h3 style="margin:0">How to publish (GitHub Pages) — जल्दी में</h3>
-        <ol class="small">
-          <li>GitHub पर एक मुफ्त अकाउंट बनाओ।</li>
-          <li>नया रिपॉज़िटरी बनाओ, नाम कुछ भी दे दो (e.g. workerhire).</li>
-          <li>इस <strong>index.html</strong> फाइल को रिपॉज़िटरी में अपलोड करो (Add file → Upload files)।</li>
-          <li>Settings → Pages में जाओ → Branch: main, folder: / (root) और Save करो।</li>
-          <li>कुछ मिनट बाद साइट चलेगी: https://<strong>your-username</strong>.github.io/<strong>repo-name</strong></li>
-        </ol>
-        <div class="muted">मुझे बताओ मैं zip बना दूँ या GitHub पर डालना सिखाऊँ?</div>
-      </div>
-    </aside>
-  </main>
-
-  <footer>
-    Tip: फोटो और एडिट/डिलीट अब काम करता है। अगर आप चाहो तो मैं आपकी जगह GitHub पर स्टेप-बाय-स्टेप डालकर भी गाइड कर दूँ।
-  </footer>
-
-  <!-- Booking modal (simple) -->
-  <div id="modal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.4)">
-    <div style="width:460px;background:white;padding:18px;border-radius:12px;max-width:95%">
-      <h3 id="modalTitle">Book</h3>
-      <form id="bookingForm">
-        <input id="bWorkerId" type="hidden" />
-        <label>Your name</label>
-        <input id="bName" type="text" required />
-        <label>Contact (phone)</label>
-        <input id="bContact" type="text" required />
+      <div style="margin-bottom:10px">
         <label>Hours</label>
-        <input id="bHours" type="number" min="1" value="1" required />
-        <label>Date & time</label>
-        <input id="bDate" type="datetime-local" required />
-        <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
-          <button type="button" id="closeModal" style="background:#ef4444">Cancel</button>
-          <button type="submit" class="book-btn">Confirm Booking</button>
-        </div>
-      </form>
+        <input id="hours" type="number" value="1" min="1"/>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="bookBtn">Book & Pay</button>
+        <div id="status" class="muted" style="margin-left:8px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>How this works</h3>
+      <ol class="muted">
+        <li>Click a worker, set hours and press <b>Book & Pay</b>.</li>
+        <li>Razorpay checkout opens. After payment, backend verifies order.</li>
+        <li>Platform takes commission (10%) — you can see it in backend logic.</li>
+      </ol>
     </div>
   </div>
 
-  <script>
-    // localStorage keys
-    const LS_WORKERS = 'workerhire_workers_v1';
-    const LS_BOOKINGS = 'workerhire_bookings_v1';
+  <footer>WorkerHire • Demo • Built for you</footer>
 
-    // helpers
-    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-    const el = id => document.getElementById(id);
+<script>
+const BACKEND_URL = (location.origin); // if using Railway or custom domain, change to that URL
 
-    function loadWorkers(){ try { return JSON.parse(localStorage.getItem(LS_WORKERS) || '[]'); } catch(e){ return [] } }
-    function saveWorkers(ws){ localStorage.setItem(LS_WORKERS, JSON.stringify(ws)); }
-    function loadBookings(){ try { return JSON.parse(localStorage.getItem(LS_BOOKINGS)||'[]'); }catch(e){return[]} }
-    function saveBookings(b){ localStorage.setItem(LS_BOOKINGS, JSON.stringify(b)); }
+function saveWorkers(list){
+  localStorage.setItem('workers_v1', JSON.stringify(list));
+  renderWorkers();
+}
 
-    // render
-    function renderWorkers(){
-      const list = el('workersList'); list.innerHTML='';
-      const q = el('searchInput').value.trim().toLowerCase();
-      const cat = el('categoryFilter').value;
-      let ws = loadWorkers();
-      if(cat) ws = ws.filter(w=>w.category===cat);
-      if(q) ws = ws.filter(w=> (w.name+ ' ' + w.description + ' ' + w.category).toLowerCase().includes(q));
-      el('count').textContent = ws.length;
-      if(ws.length===0){ list.innerHTML = '<div class="card small">No profiles. Click "Load sample" to add test workers.</div>'; return }
-      ws.forEach(w=>{
-        const item = document.createElement('div'); item.className='worker';
-        const avatar = document.createElement('div'); avatar.className='avatar';
-        if(w.photo){ const img = document.createElement('img'); img.src = w.photo; avatar.appendChild(img);} else { avatar.textContent = (w.name||'U').slice(0,2).toUpperCase(); }
-        const meta = document.createElement('div'); meta.className='meta';
-        meta.innerHTML = `<h3>${escapeHtml(w.name)} <span style="font-weight:500;font-size:13px;color:var(--muted)">· ${escapeHtml(w.category)}</span></h3>
-                          <p class="small">${escapeHtml(w.description||'—')}</p>
-                          <div class="tags"><div class="tag">₹${w.rate}/hr</div>${w.rating?'<div class="tag">⭐ '+w.rating+'</div>':''}</div>`;
-        const right = document.createElement('div'); right.style.textAlign='right';
-        right.innerHTML = `<div class="small" style="margin-bottom:8px">Available: ${w.available? 'Yes':'No'}</div>
-                           <div class="actions" style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-                             <button data-id="${w.id}" class="book-now">Book</button>
-                             <button data-id="${w.id}" class="edit-now" style="background:#f59e0b">Edit</button>
-                             <button data-id="${w.id}" class="delete-now danger">Delete</button>
-                           </div>`;
-        item.appendChild(avatar); item.appendChild(meta); item.appendChild(right);
-        list.appendChild(item);
-      });
+function loadWorkers(){
+  try{
+    return JSON.parse(localStorage.getItem('workers_v1')||'[]');
+  }catch(e){return []}
+}
 
-      // handlers
-      document.querySelectorAll('.book-now').forEach(btn=>btn.onclick = ()=>openBooking(btn.dataset.id));
-      document.querySelectorAll('.edit-now').forEach(btn=>btn.onclick = ()=>startEdit(btn.dataset.id));
-      document.querySelectorAll('.delete-now').forEach(btn=>btn.onclick = ()=>removeWorker(btn.dataset.id));
-    }
+function renderWorkers(){
+  const container = document.getElementById('workers');
+  const select = document.getElementById('selectWorker');
+  const list = loadWorkers();
+  container.innerHTML = '';
+  select.innerHTML = '<option value="">Choose a worker</option>';
+  list.forEach((w,i)=>{
+    const el = document.createElement('div'); el.className='worker';
+    el.innerHTML = `<strong>${w.name}</strong><div class="muted">${w.cat} • ₹${w.rate}/hr</div><div style="margin-top:8px">${w.desc||''}</div><div style="margin-top:8px"><button onclick="pick(${i})">Book</button></div>`;
+    container.appendChild(el);
+    const opt = document.createElement('option'); opt.value=i; opt.text = `${w.name} • ${w.cat} • ₹${w.rate}/hr`;
+    select.appendChild(opt);
+  });
+}
 
-    function renderBookings(){
-      const bList = el('bookingsList'); bList.innerHTML='';
-      const bookings = loadBookings();
-      if(bookings.length===0){ bList.innerHTML='<div class="small">You have no bookings yet.</div>'; return }
-      bookings.slice().reverse().forEach(b=>{
-        const w = loadWorkers().find(x=>x.id===b.workerId) || {name:'Unknown'};
-        const node = document.createElement('div'); node.style.padding='8px 0';
-        node.innerHTML = `<div style="font-weight:700">${escapeHtml(w.name)} — ${b.hours} hr(s)</div>
-                          <div class="small">By ${escapeHtml(b.name)} on ${new Date(b.at).toLocaleString()}</div>
-                          <div class="small">Contact: ${escapeHtml(b.contact)}</div>`;
-        bList.appendChild(node);
-      });
-    }
+function pick(i){
+  document.getElementById('selectWorker').value = i;
+  window.scrollTo({top:400,behavior:'smooth'});
+}
 
-    // booking modal
-    function openBooking(id){
-      const w = loadWorkers().find(x=>x.id===id); if(!w){ alert('Worker not found'); return }
-      el('modalTitle').textContent = 'Book ' + w.name + ' ('+w.category+')';
-      el('bWorkerId').value = id; el('bHours').value = 1; el('bDate').value = new Date().toISOString().slice(0,16);
-      el('quickBookArea').innerHTML = `<div><strong>${w.name}</strong><div class="small">₹${w.rate}/hr</div></div>`;
-      el('modal').style.display = 'flex';
-    }
-    el('closeModal')?.addEventListener('click', ()=> el('modal').style.display='none');
+document.getElementById('addWorker').onclick = ()=>{
+  const name=document.getElementById('wname').value.trim();
+  const cat=document.getElementById('wcat').value;
+  const rate=document.getElementById('wrate').value;
+  const desc=document.getElementById('wdesc').value;
+  if(!name||!rate){ alert('Name and rate required'); return; }
+  const list = loadWorkers();
+  list.push({name,cat,rate:parseFloat(rate),desc});
+  saveWorkers(list);
+  document.getElementById('wname').value='';document.getElementById('wrate').value='';document.getElementById('wdesc').value='';
+}
 
-    // add / edit worker
-    el('addWorkerForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      const editingId = el('wId').value || null;
-      const name = el('wName').value.trim();
-      const category = el('wCategory').value; const rate = parseInt(el('wRate').value) || 0;
-      const desc = el('wDesc').value.trim();
+document.getElementById('loadSample').onclick = ()=>{
+  const sample = [
+    {name:'Ramesh',cat:'Plumber',rate:200,desc:'5 yrs experience'},
+    {name:'Sunita',cat:'Housemaid',rate:150,desc:'Trustworthy and punctual'},
+    {name:'Anil',cat:'Carpenter',rate:250,desc:'Specialist in furniture'}
+  ];
+  saveWorkers(sample);
+}
 
-      const fileInput = el('wPhoto');
-      if(fileInput.files && fileInput.files[0]){
-        const reader = new FileReader();
-        reader.onload = function(evt){
-          const photoData = evt.target.result;
-          saveWorkerObject(editingId, name, category, rate, desc, photoData);
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-      } else {
-        // no new photo selected; keep existing if editing
-        const existing = editingId ? (loadWorkers().find(w=>w.id===editingId) || {}) : {};
-        saveWorkerObject(editingId, name, category, rate, desc, existing.photo || null);
-      }
+document.getElementById('bookBtn').onclick = async ()=>{
+  const sel = document.getElementById('selectWorker').value;
+  const hours = parseFloat(document.getElementById('hours').value||1);
+  const status = document.getElementById('status');
+  if(sel===''){ alert('Select a worker'); return; }
+  const workers = loadWorkers(); const w = workers[sel];
+  const total = (w.rate * hours);
+  status.textContent = 'Creating order...';
+  try{
+    const resp = await fetch(BACKEND_URL + '/create_order', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amount_rupees: total })
     });
+    if(!resp.ok) throw new Error('Order creation failed');
+    const data = await resp.json();
+    const order = data.order;
+    status.textContent = 'Opening checkout...';
+    openRazorpayCheckout(order.id, total, w.name);
+  }catch(err){
+    status.textContent = 'Error: ' + err.message;
+  }
+}
 
-    function saveWorkerObject(editingId, name, category, rate, desc, photoData){
-      if(editingId){
-        const ws = loadWorkers();
-        const idx = ws.findIndex(w=>w.id===editingId);
-        if(idx>-1){ ws[idx] = {...ws[idx], name, category, rate, description:desc, photo:photoData}; saveWorkers(ws); }
-        resetForm(); renderWorkers();
-      } else {
-        const w = { id: uid(), name, category, rate, description: desc, rating: (Math.random()*1.6+3.4).toFixed(1), available:true, photo: photoData };
-        const ws = loadWorkers(); ws.push(w); saveWorkers(ws); renderWorkers(); resetForm();
-      }
-    }
+function openRazorpayCheckout(orderId, amount, workerName){
+  // Razorpay checkout requires key: use backend to provide key_id via env or hardcode public key in frontend (not recommended)
+  const options = {
+    "key": "{{RAZORPAY_KEY_ID}}", // REPLACE this placeholder or set via template
+    "amount": Math.round(amount*100),
+    "currency": "INR",
+    "name": "WorkerHire",
+    "description": "Booking: " + workerName,
+    "order_id": orderId,
+    "handler": function (response){
+      alert('Payment successful. Payment id: ' + response.razorpay_payment_id);
+      document.getElementById('status').textContent = 'Payment success';
+    },
+    "prefill": { "name": "" },
+    "theme": { "color": "#2563eb" }
+  };
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
 
-    function startEdit(id){
-      const w = loadWorkers().find(x=>x.id===id); if(!w) return; el('wId').value = w.id; el('wName').value = w.name; el('wCategory').value = w.category; el('wRate').value = w.rate; el('wDesc').value = w.description || '';
-      document.getElementById('formTitle').textContent = 'Edit Worker'; document.getElementById('addBtn').textContent = 'Save Changes'; document.getElementById('cancelEdit').style.display='inline-block';
-      // note: photo input cannot be prefilled due to browser limits; existing photo kept if no new uploaded
-    }
+// Load Razorpay script
+(function(){ var s=document.createElement('script'); s.src='https://checkout.razorpay.com/v1/checkout.js'; document.head.appendChild(s); })();
 
-    document.getElementById('cancelEdit').addEventListener('click', ()=>{ resetForm(); });
-
-    function resetForm(){ el('wId').value=''; el('addWorkerForm').reset(); document.getElementById('formTitle').textContent='Add a Worker'; document.getElementById('addBtn').textContent='Add Worker'; document.getElementById('cancelEdit').style.display='none'; }
-
-    function removeWorker(id){ if(!confirm('क्या आप वाकई इस वर्कर को डिलीٹ करना चाहते हैं?')) return; const ws = loadWorkers().filter(w=>w.id!==id); saveWorkers(ws); renderWorkers(); renderBookings(); }
-
-    // seed
-    el('seedBtn').addEventListener('click', ()=>{
-      const sample = [
-        {id:uid(),name:'Ramesh Kumar',category:'Plumber',rate:200,description:'10 years experience, fast repairs',rating:4.6,available:true, photo:null},
-        {id:uid(),name:'Sita Devi',category:'Housemaid',rate:150,description:'Trustworthy and punctual',rating:4.8,available:true, photo:null},
-        {id:uid(),name:'Aakash',category:'Carpenter',rate:220,description:'Furniture and door repairing',rating:4.5,available:true, photo:null},
-        {id:uid(),name:'Munna',category:'Electrician',rate:180,description:'Wiring and fixtures',rating:4.3,available:true, photo:null}
-      ];
-      saveWorkers(sample); renderWorkers();
-    });
-
-    // booking form
-    document.getElementById('bookingForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      const workerId = el('bWorkerId').value; const name = el('bName').value.trim(); const contact = el('bContact').value.trim();
-      const hours = parseInt(el('bHours').value)||1; const at = new Date(el('bDate').value).toISOString();
-      if(!workerId){ alert('Worker missing'); return }
-      const bookings = loadBookings(); bookings.push({id:uid(),workerId,name,contact,hours,at,created: new Date().toISOString()}); saveBookings(bookings);
-      el('modal').style.display='none'; el('bookingForm').reset(); renderBookings(); alert('Booking confirmed');
-    });
-
-    // search / filter
-    el('searchInput').addEventListener('input', ()=> renderWorkers());
-    el('categoryFilter').addEventListener('change', ()=> renderWorkers());
-
-    el('clearStorage').addEventListener('click', ()=>{
-      if(confirm('This will remove all workers and bookings from this browser. Proceed?')){ localStorage.removeItem(LS_WORKERS); localStorage.removeItem(LS_BOOKINGS); renderWorkers(); renderBookings(); }
-    });
-
-    // helpers
-    function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>\"'`]/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;', '`':'&#96;' })[s]); }
-
-    // init
-    (function(){ renderWorkers(); renderBookings();
-      // keep empty until user seeds or adds
-    })();
-  </script>
+// initial render
+renderWorkers();
+</script>
 </body>
 </html>
