@@ -261,5 +261,40 @@ renderWorkers();
 </script>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-</body>
+<!-- Demo add button (paste this just before </body>) -->
+<button id="addDemoWorkerBtn" style="position:fixed;right:16px;bottom:80px;z-index:99999;
+  padding:10px 14px;border-radius:10px;border:none;background:#2e7d32;color:#fff;
+  box-shadow:0 6px 18px rgba(0,0,0,0.15);font-weight:600;">Add demo worker</button>
+
+<script>
+  // अगर पहले से मौजूद नहीं तो सुरक्षा से define करो
+  function safeLoadWorkers(){
+    try{return loadworkers();}catch(e){ try{ return JSON.parse(localStorage.getItem('workers_v1')||'[]'); }catch(e2){return [];} }
+  }
+  function safeSaveWorkers(list){
+    try{ saveworkers(list); }catch(e){ try{ localStorage.setItem('workers_v1', JSON.stringify(list)); }catch(e2){} }
+  }
+
+  document.getElementById('addDemoWorkerBtn').addEventListener('click', function(){
+    const demo = {
+      name: 'Ram',
+      cat: 'Plumber',
+      rate: 200,
+      desc: 'Experienced plumber - sample profile',
+      photo: '' // खाली छोड़ो (base64/URL रखने के लिए)
+    };
+
+    // लोड, जोड़ो, सेव करो, और रेंडर करो
+    const list = safeLoadWorkers() || [];
+    list.push(demo);
+    safeSaveWorkers(list);
+
+    // अगर renderworkers मौजूद है तो कॉल करो ताकि UI तुरंत अपडेट हो
+    try{ renderworkers(); }catch(e){ /* ignored */ }
+
+    // यूज़र को सूचित करो और ऊपर ले जाओ
+    alert('Demo worker add हो गया — यदि नहीं दिखे तो page refresh करो');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+</script></body>
 </html>
