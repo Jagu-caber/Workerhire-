@@ -1,300 +1,259 @@
 <!doctype html>
+
 <html lang="hi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>WorkerHire — Premium</title>
-<style>
-:root{--accent:#2563eb;--muted:#6b7280}
-*{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans","Helvetica Neue",Arial}
-body{margin:0;background:linear-gradient(180deg,#eff0ff 0,#fff 100%);color:#111}
-.container{max-width:920px;margin:24px auto;padding:0 16px}
-.card{background:var(--card,#fff);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,.06);margin-bottom:16px}
-label{display:block;font-weight:600;margin-bottom:8px}
-input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6}
-.row{display:flex;gap:12px}
-.col{flex:1}
-button{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
-.muted{color:var(--muted);font-size:14px}
-.worker-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.worker{padding:12px;border-radius:10px;border:1px solid #eef3ff;background:#fff}
-footer{padding:24px;text-align:center;color:var(--muted)}
-img.profile{width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid #ddd}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WorkerHire — Demo</title>
+  <style>
+    :root{--accent:#2563eb;--muted:#6b7280;--card:#fff;--bg:#f6f7fb}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:0;background:var(--bg);color:#111}
+    .container{max-width:920px;margin:20px auto;padding:16px}
+    .card{background:var(--card);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06)}
+    h1,h2,h3{margin:0 0 8px}
+    label{display:block;font-weight:600;margin-bottom:6px;color:#333}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid #e7e7e7}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    button{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#10b981}
+    .muted{color:var(--muted);font-size:14px}
+    .worker-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .worker{padding:12px;border-radius:10px;border:1px solid #eef3ff;background:#fff}
+    .profile{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+    .actions{display:flex;gap:8px}
+    select#selectWorker{height:44px}
+    .notice{color:var(--muted);font-size:13px;margin-top:8px}
+    footer{text-align:center;padding:20px;color:var(--muted)}
+    @media (max-width:520px){.profile{height:120px}}
+  </style>
 </head>
 <body>
-<header class="container">
-  <h1>WorkerHire — Premium</h1>
-  <div class="muted">Local demo — backend optional. Use Railway or your server for payments.</div>
-</header>
-
-<div class="container">
-  <div class="card">
-    <h3>Available Workers</h3>
-    <div id="workers" class="worker-list"><!-- JS will render --></div>
-    <div class="muted" style="margin-top:8px">Add sample worker or create your own profile.</div>
+  <div class="container">
+    <header class="card">
+      <h1>WorkerHire — Demo</h1>
+      <div class="muted">Local demo — फोटो और डाटा browser localStorage में सेव होंगे</div>
+    </header><div class="card">
+  <h3>Available Workers</h3>
+  <div id="workers" class="worker-list">
+    <!-- js will render -->
   </div>
-
-  <div class="card">
-    <h3>Add Worker (Demo) <label style="display:inline;font-weight:400">Photo (optional)</label></h3>
-    <input id="wphoto" type="file" accept="image/*" />
-    <div style="margin-bottom:8px;margin-top:8px">
-      <label>Name</label>
-      <input id="wname" placeholder="Ram, Suresh..." />
-    </div>
-    <div class="row" style="margin-bottom:8px">
-      <div class="col">
-        <label>Category</label>
-        <select id="wcat">
-          <option>Plumber</option>
-          <option>Carpenter</option>
-          <option>Housemaid</option>
-          <option>Electrician</option>
-        </select>
-      </div>
-      <div class="col">
-        <label>Rate per hour (₹)</label>
-        <input id="wrate" placeholder="e.g. 200" type="number"/>
-      </div>
-    </div>
-
-    <label>Short description</label>
-    <textarea id="wdesc" rows="2" placeholder="Experience and skills..."></textarea>
-
-    <div style="margin-top:10px">
-      <button id="addWorker">Add Worker</button>
-      <button id="loadSample" style="margin-left:8px;background:#0ea35a">Load sample</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Book a Worker (Quick)</h3>
-    <div style="margin-bottom:10px">
-      <label>Select Worker</label>
-      <select id="selectWorker"></select>
-    </div>
-    <div style="margin-bottom:10px">
-      <label>Hours</label>
-      <input id="hours" type="number" value="1" min="1" />
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button id="bookBtn">Book & Pay</button>
-      <div id="status" class="muted" style="margin-left:8px"></div>
-    </div>
-    <div class="muted" style="margin-top:8px">
-      <ol>
-        <li>Click a worker, set hours and press <b>Book & Pay</b>.</li>
-        <li>Razorpay checkout will open (if backend configured).</li>
-        <li>Platform takes commission (10%) — backend calculates it.</li>
-      </ol>
-    </div>
-  </div>
-
-<footer class="card">WorkerHire • Demo • Built for you</footer>
+  <div class="muted" style="margin-top:8px">Add sample worker या अपना प्रोफ़ाइल बनायें।</div>
 </div>
 
-<script>
-/* - FRONTEND demo
- - Photos saved as base64 in localStorage (workers_v1)
- - If you have a backend, set BACKEND_URL to your server and it will create Razorpay orders.
-*/
-const BACKEND_URL = https://workerhire-production-7363.up.railway.app; // edit if backend on other origin
+<div class="card">
+  <h3>Add Worker (Demo) <label style="display:inline;font-weight:400">Photo (optional)</label></h3>
+  <input id="wphoto" type="file" accept="image/*" />
 
-function saveWorkers(list){
-  localStorage.setItem('workers_v1', JSON.stringify(list));
-  renderWorkers();
-}
+  <div style="margin-bottom:8px;margin-top:8px">
+    <label>Name</label>
+    <input id="wname" placeholder="Ram, Suresh..." />
+  </div>
 
-function loadWorkers(){
-  try{ return JSON.parse(localStorage.getItem('workers_v1'))||[]; }
-  catch(e){ return [] }
-}
+  <div class="row" style="margin-bottom:8px">
+    <div class="col">
+      <label>Category</label>
+      <select id="wcat">
+        <option>Plumber</option>
+        <option>Carpenter</option>
+        <option>Housemaid</option>
+        <option>Electrician</option>
+      </select>
+    </div>
+    <div class="col">
+      <label>Rate per hour (₹)</label>
+      <input id="wrate" placeholder="e.g. 200" type="number" />
+    </div>
+  </div>
 
-function renderWorkers() {
-  const container = document.getElementById('workers');
-  const select = document.getElementById('selectWorker');
-  const list = loadWorkers();
+  <label>Short description</label>
+  <textarea id="wdesc" rows="2" placeholder="Experience and skills..."></textarea>
 
-  container.innerHTML = '';
-  select.innerHTML = '<option value="">Choose a worker</option>';
+  <div style="margin-top:10px;display:flex;gap:8px">
+    <button id="addWorker">Add Worker</button>
+    <button id="loadSample" class="secondary" style="width:auto;padding:10px 14px">Load sample</button>
+  </div>
+</div>
 
-  list.forEach((w, i) => {
+<div class="card">
+  <h3>Book a Worker (Quick)</h3>
+  <div style="margin-bottom:10px">
+    <label>Select Worker</label>
+    <select id="selectWorker"></select>
+  </div>
+  <div style="margin-bottom:10px">
+    <label>Hours</label>
+    <input id="hours" type="number" value="1" min="1" />
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="bookBtn">Book & Pay</button>
+    <div id="status" class="muted" style="margin-left:8px"></div>
+  </div>
 
-    const el = document.createElement('div');
-    el.className = 'worker';
+  <div class="muted" style="margin-top:8px">
+    <ol>
+      <li>Click a worker, set hours and press <b>Book & Pay</b>.</li>
+      <li>Razorpay checkout will open (if backend configured).</li>
+      <li>Platform takes commission (10%) — backend calculates it.</li>
+    </ol>
+  </div>
+</div>
 
-    // photo html
-    let photoHtml = '';
-    if (w.photo) {
-      photoHtml = `
-        <div style="margin-bottom:8px">
-            <img src="${w.photo}" class="profile" />
-        </div>
-      `;
+<footer class="card">WorkerHire • Demo • Built for you</footer>
+
+  </div>  <script>
+    // --- CONFIG: edit these if you have a backend or Razorpay key ---
+    // If you don't have backend just leave BACKEND_URL = null and booking will be demo-only
+    const BACKEND_URL = null; // e.g. 'https://your-server.example.com'
+    const RAZORPAY_KEY_ID = null; // e.g. 'rzp_test_xxx' — used only if backend supports creating orders
+
+    // --- helpers ---
+    function saveWorkers(list){
+      localStorage.setItem('workers_v1', JSON.stringify(list));
+      renderWorkers();
     }
 
-    el.innerHTML = `
-      ${photoHtml}
-      <strong>${w.name}</strong>
-      <div class="muted">${w.cat} • ₹${w.rate}/hr</div>
-      <div style="margin-top:8px">${w.desc || ''}</div>
-      <div style="margin-top:8px">
-        <button onclick="pick(${i})">Book</button>
-      </div>
-    `;
-
-    container.appendChild(el);
-
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.text = `${w.name} • ${w.cat} • ₹${w.rate}/hr`;
-    select.appendChild(opt);
-  });
-}
-
-function pick(i){
-  document.getElementById('selectWorker').value = i;
-  window.scrollTo({top:400,behavior:'smooth'});
-}
-
-document.getElementById('addWorker').onclick = async ()=>{
-  const name = document.getElementById('wname').value.trim();
-  const cat  = document.getElementById('wcat').value;
-  const rate = document.getElementById('wrate').value;
-  const desc = document.getElementById('wdesc').value;
-  const photoInput = document.getElementById('wphoto');
-
-  if(!name || !rate){ alert('Name and rate required'); return; }
-
-  function readFileAsDataURL(file){
-    return new Promise((resolve, reject)=>{
-      if(!file) return resolve(null);
-      const fr = new FileReader();
-      fr.onload = ()=> resolve(fr.result);
-      fr.onerror = ()=> reject(new Error('File read error'));
-      fr.readAsDataURL(file);
-    });
-  }
-
-  let photoData = null;
-  if(photoInput && photoInput.files && photoInput.files[0]){
-    try{
-      photoData = await readFileAsDataURL(photoInput.files[0]);
-    }catch(e){
-      console.warn('Photo read failed', e);
-      photoData = null;
+    function loadWorkers(){
+      try{return JSON.parse(localStorage.getItem('workers_v1'))||[];}catch(e){return[]}
     }
-  }
 
-  const list = loadWorkers();
-  list.push({
-    name,
-    cat,
-    rate: parseFloat(rate),
-    desc,
-    photo: photoData
-  });
-  saveWorkers(list);
-
-  document.getElementById('wname').value='';
-  document.getElementById('wrate').value='';
-  document.getElementById('wdesc').value='';
-  if(photoInput) photoInput.value = '';
-}
-
-document.getElementById('loadSample').onclick = ()=>{
-  const sample = [
-    {name:'Raju Kumar',cat:'Plumber',rate:200,desc:'5 years experience',photo:null},
-    {name:'Sita Devi',cat:'Housemaid',rate:150,desc:'Reliable and punctual',photo:null},
-    {name:'Amit Singh',cat:'Electrician',rate:300,desc:'Certified electrician',photo:null}
-  ];
-  saveWorkers(sample);
-}
-
-document.getElementById('bookBtn').onclick = async ()=>{
-  const idx = document.getElementById('selectWorker').value;
-  const hours = parseFloat(document.getElementById('hours').value)||1;
-  const status = document.getElementById('status');
-  if(idx===''){ alert('Choose a worker'); return; }
-  const w = loadWorkers()[idx];
-  const amount = Math.round(w.rate * hours * 100); // paise
-  status.textContent = 'Processing...';
-
-  // If backend available, call it to create an order (Razorpay)
-  try{
-    if(BACKEND_URL && BACKEND_URL.length>3 && BACKEND_URL.indexOf('http')===0){
-      const resp = await fetch(BACKEND_URL + '/create-order', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({amount,notes:{worker:w.name,hours}})
+    function readFileAsDataURL(file){
+      return new Promise((resolve,reject)=>{
+        if(!file) return resolve(null);
+        const fr = new FileReader();
+        fr.onload = ()=> resolve(fr.result);
+        fr.onerror = ()=> reject(new Error('File read error'));
+        fr.readAsDataURL(file);
       });
-      const data = await resp.json();
-      if(!data || !data.id){ status.textContent = 'Order creation failed'; return; }
-      // open Razorpay checkout
-      const options = {
-        key: data.key_id || '', // optional: server may return key id
-        amount: data.amount,
-        currency: data.currency || 'INR',
-        name: 'WorkerHire',
-        description: `${w.name} — ${w.cat}`,
-        order_id: data.id,
-        handler: function(response){
-          alert('Payment success! Order id: ' + response.razorpay_order_id);
-          status.textContent = 'Payment success';
-        },
-        prefill:{name:'Customer', email:''}
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } else {
-      alert('No backend configured. Booking recorded locally.');
-      status.textContent = 'Booked (demo)';
     }
-  }catch(e){
-    console.error(e);
-    status.textContent = 'Error: ' + (e.message||e);
-  }
-}
 
-// initialize
-renderWorkers();
-</script>
+    // render list & select
+    function renderWorkers(){
+      const container = document.getElementById('workers');
+      const select = document.getElementById('selectWorker');
+      const list = loadWorkers();
+      container.innerHTML = '';
+      select.innerHTML = '<option value="">Choose a worker</option>';
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<!-- Demo add button (paste this just before </body>) -->
-<button id="addDemoWorkerBtn" style="position:fixed;right:16px;bottom:80px;z-index:99999;
-  padding:10px 14px;border-radius:10px;border:none;background:#2e7d32;color:#fff;
-  box-shadow:0 6px 18px rgba(0,0,0,0.15);font-weight:600;">Add demo worker</button>
+      list.forEach((w,i)=>{
+        const el = document.createElement('div'); el.className='worker';
+        const photoHtml = w.photo ? `<img src="${w.photo}" class="profile" alt="${w.name}"/>` : '';
+        el.innerHTML = `
+          ${photoHtml}
+          <strong>${w.name}</strong>
+          <div class="muted">${w.cat} • ₹${w.rate}/hr</div>
+          <div style="margin-top:8px">${w.desc || ''}</div>
+          <div class="actions" style="margin-top:8px">
+            <button data-i="${i}" style="flex:1">Select</button>
+          </div>
+        `;
+        container.appendChild(el);
 
-<script>
-  // अगर पहले से मौजूद नहीं तो सुरक्षा से define करो
-  function safeLoadWorkers(){
-    try{return loadworkers();}catch(e){ try{ return JSON.parse(localStorage.getItem('workers_v1')||'[]'); }catch(e2){return [];} }
-  }
-  function safeSaveWorkers(list){
-    try{ saveworkers(list); }catch(e){ try{ localStorage.setItem('workers_v1', JSON.stringify(list)); }catch(e2){} }
-  }
+        // add to select
+        const opt = document.createElement('option'); opt.value = i; opt.text = `${w.name} — ${w.cat} — ₹${w.rate}/hr`;
+        select.appendChild(opt);
+      });
 
-  document.getElementById('addDemoWorkerBtn').addEventListener('click', function(){
-    const demo = {
-      name: 'Ram',
-      cat: 'Plumber',
-      rate: 200,
-      desc: 'Experienced plumber - sample profile',
-      photo: '' // खाली छोड़ो (base64/URL रखने के लिए)
-    };
+      // attach select buttons
+      container.querySelectorAll('button[data-i]').forEach(btn=>{
+        btn.onclick = (e)=>{
+          const idx = e.currentTarget.getAttribute('data-i');
+          document.getElementById('selectWorker').value = idx;
+          window.scrollTo({top:0,behavior:'smooth'});
+        }
+      });
+    }
 
-    // लोड, जोड़ो, सेव करो, और रेंडर करो
-    const list = safeLoadWorkers() || [];
-    list.push(demo);
-    safeSaveWorkers(list);
+    // add worker handler
+    async function addWorkerHandler(){
+      try{
+        const name = (document.getElementById('wname').value||'').trim();
+        const cat = (document.getElementById('wcat').value||'').trim();
+        const rate = (document.getElementById('wrate').value||'').trim();
+        const desc = (document.getElementById('wdesc').value||'').trim();
+        const photoInput = document.getElementById('wphoto');
 
-    // अगर renderworkers मौजूद है तो कॉल करो ताकि UI तुरंत अपडेट हो
-    try{ renderworkers(); }catch(e){ /* ignored */ }
+        if(!name || !rate){ alert('Name और Rate डालना ज़रूरी है'); return; }
 
-    // यूज़र को सूचित करो और ऊपर ले जाओ
-    alert('Demo worker add हो गया — यदि नहीं दिखे तो page refresh करो');
-    window.scrollTo({top:0, behavior:'smooth'});
-  });
-</script></body>
+        let photoData = null;
+        if(photoInput && photoInput.files && photoInput.files[0]){
+          try{ photoData = await readFileAsDataURL(photoInput.files[0]); }catch(e){ console.warn('Photo read failed', e); photoData = null; }
+        }
+
+        const list = loadWorkers();
+        list.push({name, cat:cat||'Other', rate: Number(rate)||rate, desc, photo: photoData});
+        saveWorkers(list);
+
+        alert('Worker added successfully');
+        // clear form
+        document.getElementById('wname').value='';
+        document.getElementById('wrate').value='';
+        document.getElementById('wdesc').value='';
+        if(photoInput) photoInput.value='';
+
+        window.scrollTo({top:0,behavior:'smooth'});
+      }catch(err){ console.error('Add worker error', err); alert('कुछ गलती हुई — console में देखें'); }
+    }
+
+    // attach add button (safe if DOM not ready)
+    function attachAddWorker(){
+      const btn = document.getElementById('addWorker');
+      if(btn) btn.onclick = addWorkerHandler;
+      else setTimeout(attachAddWorker,300);
+    }
+
+    // load sample workers
+    function loadSample(){
+      const sample = [
+        {name:'Ram',cat:'Plumber',rate:200,desc:'5 years experience',photo:null},
+        {name:'Suresh',cat:'Carpenter',rate:250,desc:'Good at furniture',photo:null}
+      ];
+      saveWorkers(sample);
+      alert('Sample data loaded');
+    }
+
+    // booking (demo) — if BACKEND_URL is set, you can implement real flow
+    async function bookHandler(){
+      const idx = document.getElementById('selectWorker').value;
+      const hours = Number(document.getElementById('hours').value||1);
+      const status = document.getElementById('status');
+      if(idx === ''){ alert('Worker select करें'); return; }
+      const w = loadWorkers()[idx];
+      if(!w){ alert('Worker नहीं मिला'); return; }
+
+      const amount = (Number(w.rate)||0) * hours * 100; // paisa
+      status.textContent = 'Processing...';
+
+      if(BACKEND_URL && RAZORPAY_KEY_ID){
+        // here you'd call your backend to create an order then open Razorpay checkout
+        status.textContent = 'Backend configured — payment flow not implemented in demo';
+        // NOTE: You need a backend to create orders securely. Leave as demo if you have no server.
+      } else {
+        // demo-only: simulate success
+        setTimeout(()=>{
+          status.textContent = '';
+          alert(`Demo booking success. ${w.name} booked for ${hours} hour(s). Amount: ₹${(amount/100).toFixed(2)}`);
+        },600);
+      }
+    }
+
+    // attach book handler
+    function attachBook(){
+      const b = document.getElementById('bookBtn');
+      if(b) b.onclick = bookHandler;
+      else setTimeout(attachBook,300);
+    }
+
+    // initial setup
+    function init(){
+      attachAddWorker();
+      attachBook();
+      document.getElementById('loadSample').onclick = loadSample;
+      renderWorkers();
+    }
+
+    // run on load
+    window.addEventListener('DOMContentLoaded', init);
+  </script></body>
 </html>
