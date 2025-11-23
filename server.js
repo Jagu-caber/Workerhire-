@@ -1,70 +1,35 @@
 const express = require('express');
-const path = require('path');
 const bodyParser = require('body-parser');
-const Razorpay = require('razorpay');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname))); // serve index.html and assets
 
-// Razorpay keys from environment (set these in Railway variables)
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
+// Example simple API to save orders (in memory or file)
+let orders = [];
 
-// optional: create Razorpay instance if keys present
-let razor = null;
-if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
-  razor = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
-}
-
-// Serve static frontend (assumes index.html at repo root)
-app.use(express.static(path.join(__dirname, '/')));
-
-// health
-app.get('/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
-
-// Create order (expects { amount } in rupees)
-app.post('/create-order', async (req, res) => {
+app.post('/api/order', (req, res) => {
+  const order = req.body || {};
+  order.time = Date.now();
+  orders.push(order);
+  // optionally write to file
   try {
-    const { amount } = req.body;
-    if (!amount) return res.status(400).json({ error: 'amount required (in INR)' });
-
-    // amount rupees -> paise
-    const amtPaise = Math.round(Number(amount) * 100);
-
-    if (!razor) {
-      // if Razorpay not configured, return mock order
-      return res.json({
-        mock: true,
-        order: { id: `mock_${Date.now()}`, amount: amtPaise, currency: 'INR' }
-      });
-    }
-
-    const order = await razor.orders.create({
-      amount: amtPaise,
-      currency: 'INR',
-      payment_capture: 1
-    });
-
-    res.json({ mock: false, order });
+    fs.writeFileSync(path.join(__dirname, 'orders.json'), JSON.stringify(orders, null, 2));
   } catch (e) {
-    console.error('create-order error', e);
-    res.status(500).json({ error: e.message || 'server error' });
+    console.warn('write failed', e);
   }
+  return res.json({ ok: true, orderId: orders.length });
 });
 
-// verify webhook / payment signature (optional)
-app.post('/verify', (req, res) => {
-  // implement if you use webhooks or verify payments server-side
-  res.json({ ok: true });
+app.get('/api/orders', (req, res) => {
+  return res.json({ orders });
 });
 
-// fallback to index.html for SPA
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
