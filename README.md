@@ -1,26 +1,28 @@
-# WorkerHire — Full package (Frontend + Backend)
+WorkerHire — Full package (frontend + simple backend)
+====================================================
 
-**What is inside**
-- `index.html` — Premium single-file frontend (demo). Replace `{{RAZORPAY_KEY_ID}}` in file with your Razorpay key id or ensure your frontend gets it from a safe source.
-- `server.js` — Express backend that creates Razorpay orders. Reads keys from environment variables.
-- `package.json` — Scripts and dependencies.
+What's included
+---------------
+- `index.html` — Single-file frontend demo. Saves workers locally (localStorage). Supports uploading a photo (stored as base64).
+- `server.js` — Tiny Express backend that can create Razorpay orders. Reads keys from environment variables.
+- `package.json` — Node dependencies and start script.
 
-## Quick deploy (Railway) — Recommended
-1. Create a new Railway project and connect to this repository (or upload files).
-2. In Railway Project -> Variables add:
-   - `RAZORPAY_KEY_ID` = your razorpay key id (public)
-   - `RAZORPAY_KEY_SECRET` = your razorpay secret (keep secret!)
-3. Deploy. Railway will run `npm install` and `npm start` (package.json has start script).
-4. Open `https://<your-railway-domain>/test` to verify it returns `Backend Working`.
-5. If using backend only to serve everything, your site root will be same Railway domain. Alternatively host `index.html` on GitHub Pages and set `BACKEND_URL` to your Railway domain.
+How to use (quick)
+------------------
+Frontend-only (no backend):
+1. Open `index.html` in your browser. Add workers and test booking locally. Razorpay won't open without backend.
 
-## Notes & Security
-- **Do NOT** commit your Razorpay secret to public repo. Always use environment variables.
-- The frontend currently contains a placeholder `{{RAZORPAY_KEY_ID}}`. Replace it manually or serve the key from backend.
-- Commission logic (10%) should be implemented server-side when you capture payment or process post-payment events.
+With backend (Razorpay order creation):
+1. Create a project on Railway (or any server).
+2. Add env variables:
+   - `RAZORPAY_KEY_ID` = your razorpay key id
+   - `RAZORPAY_KEY_SECRET` = your razorpay secret
+3. Deploy `server.js` using Node (install dependencies and run `npm start`).
+4. Edit `index.html` and set `BACKEND_URL` to your deployed server URL (for Railway it will be like `https://yourapp.up.railway.app`).
+5. Open frontend and Book & Pay — checkout will open.
 
-If you want, I can now:
-- Push these 3 files into your GitHub repo (you'll need to give repo name and confirm), OR
-- Give you the ZIP to download and upload yourself.
-
-Reply 'push' to ask me to prepare for pushing, or 'download' to get the ZIP link.
+Notes
+-----
+- Photos are saved in localStorage (demo). For production use, upload images to S3 or Cloud storage and save URLs in DB.
+- Commission (10%) is calculated in `server.js` and added to order notes (example only). Integrate server-side DB & verification for real app.
+- This package is a demo starter, not production-ready. Security, validation, webhooks and signature verification must be added for real payments.

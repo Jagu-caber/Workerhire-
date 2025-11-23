@@ -1,102 +1,105 @@
 <!doctype html>
 <html lang="hi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WorkerHire — Premium</title>
-  <style>
-    :root{--accent:#2563eb;--bg:#f7fbff;--card:#fff;--muted:#6b7280}
-    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans","Helvetica Neue",Arial}
-    body{margin:0;background:linear-gradient(180deg,#eef6ff 0%,#fff 100%);color:#111}
-    header{background:linear-gradient(90deg, #1e3a8a, #2563eb);color:#fff;padding:24px 20px}
-    h1{margin:0;font-size:20px}
-    .container{max-width:920px;margin:24px auto;padding:0 16px}
-    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06);margin-bottom:16px}
-    label{display:block;font-weight:600;margin-bottom:8px}
-    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6edf8;background:#fbfdff}
-    .row{display:flex;gap:12px}
-    .col{flex:1}
-    button{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
-    .muted{color:var(--muted);font-size:14px}
-    .worker-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    .worker{padding:12px;border-radius:10px;border:1px solid #eef3ff;background:#fff}
-    footer{padding:24px;text-align:center;color:var(--muted)}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WorkerHire — Premium</title>
+<style>
+:root{--accent:#2563eb;--muted:#6b7280}
+*{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans","Helvetica Neue",Arial}
+body{margin:0;background:linear-gradient(180deg,#eff0ff 0,#fff 100%);color:#111}
+.container{max-width:920px;margin:24px auto;padding:0 16px}
+.card{background:var(--card,#fff);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,.06);margin-bottom:16px}
+label{display:block;font-weight:600;margin-bottom:8px}
+input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6}
+.row{display:flex;gap:12px}
+.col{flex:1}
+button{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+.muted{color:var(--muted);font-size:14px}
+.worker-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.worker{padding:12px;border-radius:10px;border:1px solid #eef3ff;background:#fff}
+footer{padding:24px;text-align:center;color:var(--muted)}
+img.profile{width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid #ddd}
+</style>
 </head>
 <body>
-  <header>
-    <h1>WorkerHire — Premium</h1>
-    <div class="muted">Local demo — backend should be on same origin (or set BACKEND_URL in code)</div>
-  </header>
+<header class="container">
+  <h1>WorkerHire — Premium</h1>
+  <div class="muted">Local demo — backend optional. Use Railway or your server for payments.</div>
+</header>
 
-  <div class="container">
-    <div class="card">
-      <h3>Available Workers</h3>
-      <div id="workers" class="worker-list">
-        <!-- JS will render -->
-      </div>
-      <div class="muted" style="margin-top:8px">Add sample worker or create your own profile.</div>
+<div class="container">
+  <div class="card">
+    <h3>Available Workers</h3>
+    <div id="workers" class="worker-list"><!-- JS will render --></div>
+    <div class="muted" style="margin-top:8px">Add sample worker or create your own profile.</div>
+  </div>
+
+  <div class="card">
+    <h3>Add Worker (Demo) <label style="display:inline;font-weight:400">Photo (optional)</label></h3>
+    <input id="wphoto" type="file" accept="image/*" />
+    <div style="margin-bottom:8px;margin-top:8px">
+      <label>Name</label>
+      <input id="wname" placeholder="Ram, Suresh..." />
     </div>
-
-    <div class="card">
-      <h3>Add Worker (Demo)</h3>
-      <div style="margin-bottom:8px">
-        <label>Name</label>
-        <input id="wname" placeholder="Ram, Suresh..." />
+    <div class="row" style="margin-bottom:8px">
+      <div class="col">
+        <label>Category</label>
+        <select id="wcat">
+          <option>Plumber</option>
+          <option>Carpenter</option>
+          <option>Housemaid</option>
+          <option>Electrician</option>
+        </select>
       </div>
-      <div class="row" style="margin-bottom:8px">
-        <div class="col">
-          <label>Category</label>
-          <select id="wcat">
-            <option>Plumber</option>
-            <option>Carpenter</option>
-            <option>Housemaid</option>
-            <option>Electrician</option>
-          </select>
-        </div>
-        <div class="col">
-          <label>Rate per hour (₹)</label>
-          <input id="wrate" placeholder="e.g. 200" type="number"/>
-        </div>
-      </div>
-      <label>Short description</label>
-      <textarea id="wdesc" rows="2" placeholder="Experience and skills..."></textarea>
-      <div style="margin-top:10px">
-        <button id="addWorker">Add Worker</button>
-        <button id="loadSample" style="margin-left:8px;background:#0ea5a4">Load sample</button>
+      <div class="col">
+        <label>Rate per hour (₹)</label>
+        <input id="wrate" placeholder="e.g. 200" type="number"/>
       </div>
     </div>
 
-    <div class="card">
-      <h3>Book a Worker (Quick)</h3>
-      <div style="margin-bottom:10px">
-        <label>Select Worker</label>
-        <select id="selectWorker"></select>
-      </div>
-      <div style="margin-bottom:10px">
-        <label>Hours</label>
-        <input id="hours" type="number" value="1" min="1"/>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="bookBtn">Book & Pay</button>
-        <div id="status" class="muted" style="margin-left:8px"></div>
-      </div>
-    </div>
+    <label>Short description</label>
+    <textarea id="wdesc" rows="2" placeholder="Experience and skills..."></textarea>
 
-    <div class="card">
-      <h3>How this works</h3>
-      <ol class="muted">
+    <div style="margin-top:10px">
+      <button id="addWorker">Add Worker</button>
+      <button id="loadSample" style="margin-left:8px;background:#0ea35a">Load sample</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Book a Worker (Quick)</h3>
+    <div style="margin-bottom:10px">
+      <label>Select Worker</label>
+      <select id="selectWorker"></select>
+    </div>
+    <div style="margin-bottom:10px">
+      <label>Hours</label>
+      <input id="hours" type="number" value="1" min="1" />
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="bookBtn">Book & Pay</button>
+      <div id="status" class="muted" style="margin-left:8px"></div>
+    </div>
+    <div class="muted" style="margin-top:8px">
+      <ol>
         <li>Click a worker, set hours and press <b>Book & Pay</b>.</li>
-        <li>Razorpay checkout opens. After payment, backend verifies order.</li>
-        <li>Platform takes commission (10%) — you can see it in backend logic.</li>
+        <li>Razorpay checkout will open (if backend configured).</li>
+        <li>Platform takes commission (10%) — backend calculates it.</li>
       </ol>
     </div>
   </div>
 
-  <footer>WorkerHire • Demo • Built for you</footer>
+<footer class="card">WorkerHire • Demo • Built for you</footer>
+</div>
 
 <script>
-const BACKEND_URL = (location.origin); // if using Railway or custom domain, change to that URL
+/*
+ - FRONTEND demo
+ - Photos saved as base64 in localStorage (workers_v1)
+ - If you have a backend, set BACKEND_URL to your server and it will create Razorpay orders.
+*/
+const BACKEND_URL = (location.origin === 'null' ? '' : location.origin); // edit if backend on other origin
 
 function saveWorkers(list){
   localStorage.setItem('workers_v1', JSON.stringify(list));
@@ -104,22 +107,48 @@ function saveWorkers(list){
 }
 
 function loadWorkers(){
-  try{
-    return JSON.parse(localStorage.getItem('workers_v1')||'[]');
-  }catch(e){return []}
+  try{ return JSON.parse(localStorage.getItem('workers_v1'))||[]; }
+  catch(e){ return [] }
 }
 
-function renderWorkers(){
+function renderWorkers() {
   const container = document.getElementById('workers');
   const select = document.getElementById('selectWorker');
   const list = loadWorkers();
+
   container.innerHTML = '';
   select.innerHTML = '<option value="">Choose a worker</option>';
-  list.forEach((w,i)=>{
-    const el = document.createElement('div'); el.className='worker';
-    el.innerHTML = `<strong>${w.name}</strong><div class="muted">${w.cat} • ₹${w.rate}/hr</div><div style="margin-top:8px">${w.desc||''}</div><div style="margin-top:8px"><button onclick="pick(${i})">Book</button></div>`;
+
+  list.forEach((w, i) => {
+
+    const el = document.createElement('div');
+    el.className = 'worker';
+
+    // photo html
+    let photoHtml = '';
+    if (w.photo) {
+      photoHtml = `
+        <div style="margin-bottom:8px">
+            <img src="${w.photo}" class="profile" />
+        </div>
+      `;
+    }
+
+    el.innerHTML = `
+      ${photoHtml}
+      <strong>${w.name}</strong>
+      <div class="muted">${w.cat} • ₹${w.rate}/hr</div>
+      <div style="margin-top:8px">${w.desc || ''}</div>
+      <div style="margin-top:8px">
+        <button onclick="pick(${i})">Book</button>
+      </div>
+    `;
+
     container.appendChild(el);
-    const opt = document.createElement('option'); opt.value=i; opt.text = `${w.name} • ${w.cat} • ₹${w.rate}/hr`;
+
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.text = `${w.name} • ${w.cat} • ₹${w.rate}/hr`;
     select.appendChild(opt);
   });
 }
@@ -129,75 +158,109 @@ function pick(i){
   window.scrollTo({top:400,behavior:'smooth'});
 }
 
-document.getElementById('addWorker').onclick = ()=>{
-  const name=document.getElementById('wname').value.trim();
-  const cat=document.getElementById('wcat').value;
-  const rate=document.getElementById('wrate').value;
-  const desc=document.getElementById('wdesc').value;
-  if(!name||!rate){ alert('Name and rate required'); return; }
+document.getElementById('addWorker').onclick = async ()=>{
+  const name = document.getElementById('wname').value.trim();
+  const cat  = document.getElementById('wcat').value;
+  const rate = document.getElementById('wrate').value;
+  const desc = document.getElementById('wdesc').value;
+  const photoInput = document.getElementById('wphoto');
+
+  if(!name || !rate){ alert('Name and rate required'); return; }
+
+  function readFileAsDataURL(file){
+    return new Promise((resolve, reject)=>{
+      if(!file) return resolve(null);
+      const fr = new FileReader();
+      fr.onload = ()=> resolve(fr.result);
+      fr.onerror = ()=> reject(new Error('File read error'));
+      fr.readAsDataURL(file);
+    });
+  }
+
+  let photoData = null;
+  if(photoInput && photoInput.files && photoInput.files[0]){
+    try{
+      photoData = await readFileAsDataURL(photoInput.files[0]);
+    }catch(e){
+      console.warn('Photo read failed', e);
+      photoData = null;
+    }
+  }
+
   const list = loadWorkers();
-  list.push({name,cat,rate:parseFloat(rate),desc});
+  list.push({
+    name,
+    cat,
+    rate: parseFloat(rate),
+    desc,
+    photo: photoData
+  });
   saveWorkers(list);
-  document.getElementById('wname').value='';document.getElementById('wrate').value='';document.getElementById('wdesc').value='';
+
+  document.getElementById('wname').value='';
+  document.getElementById('wrate').value='';
+  document.getElementById('wdesc').value='';
+  if(photoInput) photoInput.value = '';
 }
 
 document.getElementById('loadSample').onclick = ()=>{
   const sample = [
-    {name:'Ramesh',cat:'Plumber',rate:200,desc:'5 yrs experience'},
-    {name:'Sunita',cat:'Housemaid',rate:150,desc:'Trustworthy and punctual'},
-    {name:'Anil',cat:'Carpenter',rate:250,desc:'Specialist in furniture'}
+    {name:'Raju Kumar',cat:'Plumber',rate:200,desc:'5 years experience',photo:null},
+    {name:'Sita Devi',cat:'Housemaid',rate:150,desc:'Reliable and punctual',photo:null},
+    {name:'Amit Singh',cat:'Electrician',rate:300,desc:'Certified electrician',photo:null}
   ];
   saveWorkers(sample);
 }
 
 document.getElementById('bookBtn').onclick = async ()=>{
-  const sel = document.getElementById('selectWorker').value;
-  const hours = parseFloat(document.getElementById('hours').value||1);
+  const idx = document.getElementById('selectWorker').value;
+  const hours = parseFloat(document.getElementById('hours').value)||1;
   const status = document.getElementById('status');
-  if(sel===''){ alert('Select a worker'); return; }
-  const workers = loadWorkers(); const w = workers[sel];
-  const total = (w.rate * hours);
-  status.textContent = 'Creating order...';
+  if(idx===''){ alert('Choose a worker'); return; }
+  const w = loadWorkers()[idx];
+  const amount = Math.round(w.rate * hours * 100); // paise
+  status.textContent = 'Processing...';
+
+  // If backend available, call it to create an order (Razorpay)
   try{
-    const resp = await fetch(BACKEND_URL + '/create_order', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ amount_rupees: total })
-    });
-    if(!resp.ok) throw new Error('Order creation failed');
-    const data = await resp.json();
-    const order = data.order;
-    status.textContent = 'Opening checkout...';
-    openRazorpayCheckout(order.id, total, w.name);
-  }catch(err){
-    status.textContent = 'Error: ' + err.message;
+    if(BACKEND_URL && BACKEND_URL.length>3 && BACKEND_URL.indexOf('http')===0){
+      const resp = await fetch(BACKEND_URL + '/create-order', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({amount,notes:{worker:w.name,hours}})
+      });
+      const data = await resp.json();
+      if(!data || !data.id){ status.textContent = 'Order creation failed'; return; }
+      // open Razorpay checkout
+      const options = {
+        key: data.key_id || '', // optional: server may return key id
+        amount: data.amount,
+        currency: data.currency || 'INR',
+        name: 'WorkerHire',
+        description: `${w.name} — ${w.cat}`,
+        order_id: data.id,
+        handler: function(response){
+          alert('Payment success! Order id: ' + response.razorpay_order_id);
+          status.textContent = 'Payment success';
+        },
+        prefill:{name:'Customer', email:''}
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } else {
+      alert('No backend configured. Booking recorded locally.');
+      status.textContent = 'Booked (demo)';
+    }
+  }catch(e){
+    console.error(e);
+    status.textContent = 'Error: ' + (e.message||e);
   }
 }
 
-function openRazorpayCheckout(orderId, amount, workerName){
-  // Razorpay checkout requires key: use backend to provide key_id via env or hardcode public key in frontend (not recommended)
-  const options = {
-    "key": "{{RAZORPAY_KEY_ID}}", // REPLACE this placeholder or set via template
-    "amount": Math.round(amount*100),
-    "currency": "INR",
-    "name": "WorkerHire",
-    "description": "Booking: " + workerName,
-    "order_id": orderId,
-    "handler": function (response){
-      alert('Payment successful. Payment id: ' + response.razorpay_payment_id);
-      document.getElementById('status').textContent = 'Payment success';
-    },
-    "prefill": { "name": "" },
-    "theme": { "color": "#2563eb" }
-  };
-  const rzp = new Razorpay(options);
-  rzp.open();
-}
-
-// Load Razorpay script
-(function(){ var s=document.createElement('script'); s.src='https://checkout.razorpay.com/v1/checkout.js'; document.head.appendChild(s); })();
-
-// initial render
+// initialize
 renderWorkers();
 </script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>
