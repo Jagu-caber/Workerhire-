@@ -1,35 +1,44 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
+import express from "express";
+import cors from "cors";
+import Razorpay from "razorpay";
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname))); // serve index.html and assets
+app.use(express.json());
 
-// Example simple API to save orders (in memory or file)
-let orders = [];
+// Razorpay client
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
-app.post('/api/order', (req, res) => {
-  const order = req.body || {};
-  order.time = Date.now();
-  orders.push(order);
-  // optionally write to file
+// test route
+app.get("/", (req, res) => {
+  res.send("WorkerHire Backend is Running!");
+});
+
+// Order create route
+app.post("/create-order", async (req, res) => {
   try {
-    fs.writeFileSync(path.join(__dirname, 'orders.json'), JSON.stringify(orders, null, 2));
-  } catch (e) {
-    console.warn('write failed', e);
+    const { amount, name } = req.body;
+
+    const options = {
+      amount: Number(amount), // in paise
+      currency: "INR",
+      receipt: "receipt_order_" + Date.now(),
+      notes: { worker: name || "Unknown worker" }
+    };
+
+    const order = await razorpay.orders.create(options);
+    return res.json(order);
+
+  } catch (err) {
+    console.error("Order Error:", err);
+    return res.status(500).json({ error: "Order creation failed!" });
   }
-  return res.json({ ok: true, orderId: orders.length });
 });
 
-app.get('/api/orders', (req, res) => {
-  return res.json({ orders });
-});
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+// start server
+app.listen(8080, () => {
+  console.log("Server running on port 8080");
 });
