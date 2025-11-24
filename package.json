@@ -1,14 +1,12 @@
 {
   "name": "workerhire-backend",
   "version": "1.0.0",
-  "description": "Backend for WorkerHire - creates Razorpay orders",
+  "description": "Backend for WorkerHire — creates Razorpay orders",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "engines": {
-    "node": "18.x"
-  },
+  "engines": { "node": "18.x" },
   "dependencies": {
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
