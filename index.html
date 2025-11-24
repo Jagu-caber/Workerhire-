@@ -1,408 +1,92 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>WorkerHire — Premium</title>
-<link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#f3f6fb; --card:#fff; --muted:#8b95a3; --accent:#2f6af6; --danger:#e85a5a;
-    --glass: rgba(255,255,255,0.7);
-  }
-  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-  body{margin:0;background:linear-gradient(180deg,#eef5ff 0%, #f8fbff 100%);color:#17202a}
-  .wrap{max-width:920px;margin:28px auto;padding:18px}
-  header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-  header h1{margin:0;font-size:20px;}
-  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr;}}
-  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 8px 24px rgba(28,43,80,0.06)}
-  .muted{color:var(--muted);font-size:14px}
-  h2{margin:0 0 12px 0;font-size:18px}
-  .worker-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-  .worker{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid #eef3fb}
-  .profile{width:72px;height:72px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f1f5ff}
-  .wmeta{flex:1}
-  .wmeta h3{margin:0;font-size:16px}
-  .wmeta p{margin:6px 0;color:var(--muted);font-size:13px}
-  .wmeta .rate{font-weight:600;color:var(--accent)}
-  .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:none;cursor:pointer}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-green{background:#0ea35a;color:#fff}
-  .btn-outline{background:transparent;border:1px solid #dce8ff;color:var(--muted)}
-  .form-row{display:flex;gap:12px}
-  .form-row .col{flex:1}
-  label{display:block;font-size:13px;margin-bottom:8px;color:#28313a}
-  input[type="text"], input[type="number"], select, textarea{
-    width:100%;padding:10px;border-radius:10px;border:1px solid #e6eefc;background:#fbfdff;
-  }
-  textarea{min-height:70px;resize:vertical}
-  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
-  .small{font-size:13px;color:var(--muted)}
-  .controls{display:flex;gap:8px;align-items:center}
-  .select-worker{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff}
-  .badge{padding:6px 8px;border-radius:8px;background:#fbfbfb;border:1px solid #eee;font-size:13px}
-  .row-between{display:flex;justify-content:space-between;align-items:center}
-  .danger{background:var(--danger);color:#fff}
-  .center{display:flex;align-items:center;gap:8px}
-  .pill{padding:6px 10px;border-radius:999px;background:#f2f7ff;border:1px solid #e8f0ff}
-  .top-right{position:fixed;right:12px;bottom:12px}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);top:20px;background:#222;color:#fff;padding:10px 14px;border-radius:8px;opacity:0.95}
-  .hidden{display:none}
-  .delete-small{background:transparent;border:1px solid #ffdede;color:var(--danger);padding:6px 8px;border-radius:8px}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#2f6af6,#7cc2ff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">WH</div>
-    <div>
-      <h1>WorkerHire — Premium</h1>
-      <div class="small">Worker side + Customer side · Photos · Demo booking</div>
-    </div>
-  </header>
+import React, { useState, useEffect } from "react"; import { motion, AnimatePresence } from "framer-motion";
 
-  <div class="grid">
-    <!-- LEFT: Workers list + add -->
-    <div>
-      <div class="card" style="margin-bottom:12px">
-        <h2>Available Workers</h2>
-        <div class="muted">Add worker or load sample demo workers (photos included)</div>
-      </div>
+// PremiumWorkerHireUI.jsx // Single-file React component demo (Tailwind utility classes assumed available) // - Customer dashboard // - Worker dashboard // - Smooth loading + transitions // - Photo support (base64 preview) // - Sample data + hooks for backend integration
 
-      <div class="card" style="margin-bottom:12px">
-        <h2>Add Worker (Admin)</h2>
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <input id="wphoto" type="file" accept="image/*" />
-          <div class="small muted">Photo (optional)</div>
-        </div>
+export default function PremiumWorkerHireUI() { const [view, setView] = useState("customer"); // 'customer' or 'worker' const [loading, setLoading] = useState(false); const [workers, setWorkers] = useState([]); const [selectedWorker, setSelectedWorker] = useState(null); const [hours, setHours] = useState(1); const [toast, setToast] = useState(null);
 
-        <label>Name</label>
-        <input id="wname" placeholder="Ram, Suresh..." type="text"/>
+useEffect(() => { // simulate fetching workers setLoading(true); const t = setTimeout(() => { setWorkers(sampleWorkers); setLoading(false); }, 700); return () => clearTimeout(t); }, []);
 
-        <div class="form-row" style="margin-top:10px">
-          <div class="col">
-            <label>Category</label>
-            <select id="wcat">
-              <option>Plumber</option>
-              <option>Carpenter</option>
-              <option>Housemaid</option>
-              <option>Electrician</option>
-              <option>Painter</option>
-            </select>
+function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2500); }
+
+async function bookWorker(w) { setSelectedWorker(w); setLoading(true); try { // TODO: call your backend endpoint to create an order // const res = await fetch(${BACKEND_URL}/create-order, { method: 'POST', body: JSON.stringify({ amount: w.rate * hours * 100 }) }) // const json = await res.json();
+
+await new Promise((r) => setTimeout(r, 900)); // demo
+  showToast(`Booked ${w.name} for ${hours} hour(s)`);
+} catch (e) {
+  showToast("Booking failed");
+} finally {
+  setLoading(false);
+}
+
+}
+
+return ( <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6 font-sans"> <div className="max-w-5xl mx-auto"> <header className="flex items-center justify-between mb-6"> <h1 className="text-2xl font-semibold">WorkerHire — Premium</h1> <div className="flex gap-2"> <button onClick={() => setView("customer")} className={px-4 py-2 rounded-lg ${view === "customer" ? "bg-indigo-600 text-white" : "bg-white border"}} > Customer </button> <button onClick={() => setView("worker")} className={px-4 py-2 rounded-lg ${view === "worker" ? "bg-indigo-600 text-white" : "bg-white border"}} > Worker </button> </div> </header>
+
+<AnimatePresence exitBeforeEnter>
+      {loading ? (
+        <motion.div
+          key="loader"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex items-center justify-center py-20"
+        >
+          <div className="space-y-2 text-center">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-indigo-400 to-pink-400 animate-pulse" />
+            <div className="text-sm text-gray-600">Loading…</div>
           </div>
-          <div class="col">
-            <label>Rate per hour (₹)</label>
-            <input id="wrate" placeholder="e.g. 200" type="number" />
-          </div>
-        </div>
+        </motion.div>
+      ) : view === "customer" ? (
+        <motion.div key="customer" initial={{ x: 30, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -30, opacity: 0 }}>
+          <CustomerView workers={workers} onBook={bookWorker} setHours={setHours} hours={hours} />
+        </motion.div>
+      ) : (
+        <motion.div key="worker" initial={{ x: 30, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -30, opacity: 0 }}>
+          <WorkerView workers={workers} setWorkers={setWorkers} showToast={showToast} />
+        </motion.div>
+      )}
+    </AnimatePresence>
 
-        <label style="margin-top:10px">Short description</label>
-        <textarea id="wdesc" placeholder="Experience and skills..."></textarea>
-
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button id="addWorker" class="btn btn-primary">Add Worker</button>
-          <button id="loadSample" class="btn btn-green">Load sample</button>
-          <button id="clearAll" class="btn btn-outline">Clear all</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Workers</h2>
-        <div id="workers" class="worker-list" style="margin-top:12px">
-          <!-- JS will render -->
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Booking / management -->
-    <div>
-      <div class="card" style="margin-bottom:12px">
-        <h2>Book a Worker (Quick)</h2>
-        <div style="margin-bottom:10px">
-          <label>Select Worker</label>
-          <select id="selectWorker" class="select-worker"></select>
-        </div>
-
-        <label>Hours</label>
-        <input id="hours" type="number" value="1" min="1" style="margin-bottom:12px"/>
-
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <button id="bookBtn" class="btn btn-primary">Book & Pay</button>
-          <div id="status" class="muted" style="margin-left:8px"></div>
-        </div>
-
-        <ol class="muted">
-          <li>Click a worker, set hours and press <b>Book & Pay</b>.</li>
-          <li>Razorpay checkout will open if backend configured.</li>
-          <li>Platform commission (10%) can be set server-side.</li>
-        </ol>
-      </div>
-
-      <div class="card">
-        <h2>Manage</h2>
-        <div class="muted">Advanced settings and environment variables are done in your hosting (Railway).</div>
-        <div style="margin-top:12px">
-          <label class="small">Live URL</label>
-          <div class="pill" id="liveUrl">Not deployed</div>
-        </div>
-        <div style="margin-top:10px">
-          <button id="exportBtn" class="btn btn-outline">Export workers (JSON)</button>
-          <button id="importBtn" class="btn btn-outline">Import (paste JSON)</button>
-        </div>
-      </div>
-    </div>
+    <AnimatePresence>
+      {toast && (
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} className="fixed bottom-6 right-6 bg-white shadow-lg px-4 py-2 rounded-lg">
+          {toast}
+        </motion.div>
+      )}
+    </AnimatePresence>
   </div>
-
-  <footer class="muted">WorkerHire • Premium demo — built for your use</footer>
 </div>
 
-<!-- Toast area -->
-<div id="toast" class="toast hidden"></div>
+); }
 
-<script>
-/* ========== CONFIG ========== */
-/*
- If you have a backend that can create Razorpay orders:
-  - Set BACKEND_URL to your server origin (e.g. https://your-server.example)
-  - Server should have endpoint POST /create-order that returns { id: razorpay_order_id, amount, currency, ... }
-  - Also set RAZORPAY_KEY to your public key (for client integration)
- If you don't have backend, demo booking (alert) will run.
-*/
-const BACKEND_URL = "https://workerhire-production-7363.up.railway.app"; 
-const RAZORPAY_KEY = "rzp_live_RjGSrixUwgP8pU"; // <-- add if available
+function CustomerView({ workers, onBook, hours, setHours }) { return ( <div className="grid grid-cols-1 md:grid-cols-3 gap-6"> <div className="md:col-span-2"> <h2 className="text-xl font-medium mb-4">Workers</h2> <div className="space-y-4"> {workers.map((w) => ( <WorkerCard key={w.id} w={w} onBook={onBook} hours={hours} /> ))} </div> </div>
 
-/* placeholder svg photo (small) */
-const PLACEHOLDER_PHOTO = "data:image/svg+xml;utf8," + encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'>
-     <rect width='100%' height='100%' fill='#f3f6fb'/>
-     <text x='50%' y='54%' font-size='20' fill='#2f6af6' text-anchor='middle' font-family='Arial'>No Photo</text>
-   </svg>`
-);
+<aside className="bg-white p-4 rounded-lg shadow">
+    <h3 className="font-semibold">Quick Booking</h3>
+    <div className="mt-3">
+      <label className="block text-sm text-gray-600">Hours</label>
+      <input type="number" value={hours} min={1} onChange={(e) => setHours(Number(e.target.value))} className="mt-1 w-full border px-3 py-2 rounded" />
+      <div className="mt-4 text-sm text-gray-600">Select a worker from left and click Book.</div>
+    </div>
+  </aside>
+</div>
 
-/* ========== helpers ========== */
-const $ = id => document.getElementById(id);
-const toast = (msg, t=2200) => {
-  const el = $('toast'); el.textContent = msg; el.classList.remove('hidden');
-  setTimeout(()=>el.classList.add('hidden'), t);
-};
+); }
 
-/* read file as dataURL (base64) */
-function readFileAsDataURL(file){
-  return new Promise((resolve, reject)=>{
-    if(!file) return resolve(null);
-    const fr = new FileReader();
-    fr.onload = ()=> resolve(fr.result);
-    fr.onerror = ()=> reject(new Error('File read error'));
-    fr.readAsDataURL(file);
-  });
-}
+function WorkerCard({ w, onBook, hours }) { return ( <div className="bg-white p-4 rounded-xl shadow flex gap-4 items-center"> <img src={w.photo || PLACEHOLDER} alt="photo" className="w-20 h-20 rounded-lg object-cover" /> <div className="flex-1"> <div className="flex justify-between items-start"> <div> <div className="font-semibold">{w.name}</div> <div className="text-sm text-gray-500">{w.cat}</div> </div> <div className="text-indigo-600 font-medium">₹{w.rate} / hr</div> </div> <p className="text-sm text-gray-600 mt-2 truncate">{w.desc}</p> <div className="mt-3 flex gap-2"> <button onClick={() => onBook(w)} className="px-4 py-2 rounded bg-indigo-600 text-white">Book</button> <button className="px-3 py-2 rounded border">Details</button> </div> </div> </div> ); }
 
-/* localStorage helpers */
-const STORAGE_KEY = 'workers_v1';
-function saveWorkers(list){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list||[]));
-  renderWorkers();
-}
-function loadWorkers(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch(e){ return []; }
-}
+function WorkerView({ workers, setWorkers, showToast }) { async function addWorker(form) { // form: { name, cat, rate, desc, photo } const added = { id: Date.now(), ...form }; setWorkers((s) => [added, ...s]); showToast("Worker added"); }
 
-/* generate id */
-function uid(){ return Math.random().toString(36).slice(2,10); }
+return ( <div className="bg-white p-6 rounded-lg shadow"> <h2 className="text-xl font-medium mb-4">Worker Dashboard</h2> <WorkerForm onAdd={addWorker} /> <div className="mt-6"> <h3 className="font-semibold mb-3">Your Workers</h3> <div className="space-y-3"> {workers.map((w) => ( <div key={w.id} className="flex items-center gap-3 border p-3 rounded"> <img src={w.photo || PLACEHOLDER} className="w-12 h-12 rounded" /> <div className="flex-1"> <div className="font-medium">{w.name}</div> <div className="text-sm text-gray-500">{w.cat} • ₹{w.rate}/hr</div> </div> </div> ))} </div> </div> </div> ); }
 
-/* ========== render UI ========== */
-function renderWorkers(){
-  const container = $('workers');
-  const select = $('selectWorker');
-  const list = loadWorkers();
-  container.innerHTML = '';
-  select.innerHTML = '<option value="">Choose a worker</option>';
-  list.forEach((w, i) => {
-    const el = document.createElement('div'); el.className = 'worker';
-    const img = document.createElement('img'); img.className = 'profile';
-    img.src = w.photo || PLACEHOLDER_PHOTO;
-    img.alt = w.name || 'photo';
+function WorkerForm({ onAdd }) { const [name, setName] = useState(""); const [cat, setCat] = useState("Housemaid"); const [rate, setRate] = useState(200); const [desc, setDesc] = useState(""); const [photo, setPhoto] = useState(null);
 
-    const meta = document.createElement('div'); meta.className = 'wmeta';
-    const h = document.createElement('h3'); h.textContent = w.name || 'Unknown';
-    const p = document.createElement('p'); p.textContent = (w.desc || '');
-    const rate = document.createElement('div'); rate.innerHTML = `<span class="rate">₹${Number(w.rate||0)}</span> / hr • ${w.cat||'Other'}`;
+function readFileAsDataURL(file) { return new Promise((resolve, reject) => { const fr = new FileReader(); fr.onload = () => resolve(fr.result); fr.onerror = reject; fr.readAsDataURL(file); }); }
 
-    const actions = document.createElement('div'); actions.style.marginTop='8px';
-    const book = document.createElement('button'); book.className='btn btn-primary'; book.textContent='Select';
-    book.onclick = ()=> { select.value = w.id; $('status').textContent=''; scrollToTop(); renderWorkers(); }
-    const del = document.createElement('button'); del.className = 'delete-small'; del.textContent='Delete';
-    del.style.marginLeft='8px';
-    del.onclick = ()=>{
-      if(!confirm('Delete this worker?')) return;
-      const arr = loadWorkers().filter(x => x.id !== w.id);
-      saveWorkers(arr);
-      toast('Worker deleted');
-    };
+async function submit(e) { e.preventDefault(); let photoData = photo; if (photo && photo instanceof File) { photoData = await readFileAsDataURL(photo); } onAdd({ name, cat, rate, desc, photo: photoData }); setName(""); setDesc(""); setRate(200); setPhoto(null); }
 
-    actions.appendChild(book); actions.appendChild(del);
+return ( <form onSubmit={submit} className="space-y-3"> <div className="grid grid-cols-1 md:grid-cols-3 gap-3"> <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="border px-3 py-2 rounded col-span-2" /> <select value={cat} onChange={(e) => setCat(e.target.value)} className="border px-3 py-2 rounded"> <option>Housemaid</option> <option>Carpenter</option> <option>Plumber</option> <option>Electrician</option> </select> </div> <div className="grid grid-cols-1 md:grid-cols-3 gap-3"> <input type="number" value={rate} onChange={(e) => setRate(Number(e.target.value))} className="border px-3 py-2 rounded" placeholder="Rate per hour" /> <input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files[0])} className="border p-2 rounded" /> </div> <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Short description" className="w-full border px-3 py-2 rounded" /> <div> <button className="px-4 py-2 rounded bg-green-600 text-white">Add Worker</button> </div> </form> ); }
 
-    meta.appendChild(h); meta.appendChild(rate); meta.appendChild(p); meta.appendChild(actions);
-    el.appendChild(img); el.appendChild(meta);
-    container.appendChild(el);
+// Helpers & placeholder const PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' fill='%23f3f6fb'/><text x='50%' y='54%' font-size='20' fill='%232f6af6' text-anchor='middle'>No Photo</text></svg>";
 
-    // add option in select
-    const opt = document.createElement('option'); opt.value = w.id; opt.text = `${w.name} — ₹${w.rate}/hr`;
-    select.appendChild(opt);
-  });
-
-  // live url display if deployed
-  const urlEl = $('liveUrl');
-  try{ urlEl.textContent = location.origin || 'Local'; }catch(e){}
-}
-
-/* small scroll to top */
-function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
-
-/* ========== add worker handler ========== */
-async function addWorkerHandler(){
-  try{
-    const name = $('wname').value.trim();
-    const cat = $('wcat').value || 'Other';
-    const rate = $('wrate').value.trim();
-    const desc = $('wdesc').value.trim();
-    const photoInput = $('wphoto');
-
-    if(!name || !rate){
-      alert('Please enter name and rate.');
-      return;
-    }
-
-    // read photo if present
-    let photoData = null;
-    if(photoInput && photoInput.files && photoInput.files[0]){
-      try{ photoData = await readFileAsDataURL(photoInput.files[0]); }
-      catch(e){ console.warn('photo read failed', e); photoData = null; }
-    }
-    // fallback placeholder
-    photoData = photoData || PLACEHOLDER_PHOTO;
-
-    const list = loadWorkers();
-    list.push({
-      id: uid(),
-      name,
-      cat,
-      rate: Number(rate) || 0,
-      desc,
-      photo: photoData
-    });
-    saveWorkers(list);
-    toast('Worker added');
-
-    // clear form
-    $('wname').value = ''; $('wrate').value = ''; $('wdesc').value = '';
-    if(photoInput) photoInput.value = '';
-
-    scrollToTop();
-  }catch(err){
-    console.error('Add worker error', err); alert('कुछ गलती हुई — console में देखो');
-  }
-}
-
-/* load demo workers with real-ish base64 placeholder photos */
-function loadSample(){
-  const demoPhoto = PLACEHOLDER_PHOTO; // optionally replace with other dataurls
-  const samples = [
-    { name:'Jagdish', cat:'Housemaid', rate:500, desc:'Reliable, 5 years exp', photo: demoPhoto },
-    { name:'Suresh', cat:'Plumber', rate:350, desc:'Fixes leaking taps and pipelines', photo: demoPhoto },
-    { name:'Ramesh', cat:'Carpenter', rate:400, desc:'Furniture & repairs', photo: demoPhoto }
-  ];
-  const list = loadWorkers().concat(samples.map(s=>({ id: uid(), ...s })));
-  saveWorkers(list);
-  toast('Sample workers added');
-}
-
-/* clear all workers (danger) */
-function clearAll(){
-  if(confirm('Clear all workers from local storage?')){ localStorage.removeItem(STORAGE_KEY); renderWorkers(); toast('Cleared'); }
-}
-
-/* ========== booking logic ========== */
-async function bookHandler(){
-  const workerId = $('selectWorker').value;
-  const hours = Number($('hours').value) || 1;
-  if(!workerId){ alert('Please select a worker.'); return; }
-  const w = loadWorkers().find(x => x.id === workerId);
-  if(!w){ alert('Worker not found'); return; }
-
-  const amount = (Number(w.rate) || 0) * hours;
-  // Demo: if BACKEND_URL and RAZORPAY_KEY set, call backend to create order
-  if(BACKEND_URL && RAZORPAY_KEY){
-    $('status').textContent = 'Processing...';
-    try{
-      const payload = { workerId: w.id, name: w.name, hours, amount };
-      const res = await fetch((BACKEND_URL+'/create-order'), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-      const data = await res.json();
-      if(!data || !data.id) throw new Error('Order creation failed');
-      // open Razorpay checkout (client)
-      const options = {
-        key: RAZORPAY_KEY,
-        amount: data.amount,
-        currency: data.currency || 'INR',
-        name: 'WorkerHire',
-        description: `Booking ${w.name}`,
-        order_id: data.id,
-        handler: function(response){
-          alert('Payment success! Order id: ' + (response.razorpay_order_id || response.razorpay_payment_id));
-        }
-      };
-      const rzp = new window.Razorpay ? new Razorpay(options) : null;
-      if(rzp) rzp.open();
-      else alert('Razorpay not loaded on page');
-    }catch(e){ console.error(e); alert('Order creation failed'); }
-    $('status').textContent = '';
-    return;
-  }
-
-  // fallback demo booking
-  alert(`Demo booking success. ${w.name} booked for ${hours} hour(s). Amount: ₹${(amount).toFixed(2)}`);
-}
-
-/* ========== export / import ========== */
-function exportJSON(){
-  const data = JSON.stringify(loadWorkers(), null, 2);
-  navigator.clipboard && navigator.clipboard.writeText(data).then(()=> toast('JSON copied to clipboard'));
-  // also prompt download
-  const blob = new Blob([data], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'workers.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-function importJSON(){
-  const txt = prompt('Paste workers JSON here');
-  if(!txt) return;
-  try{
-    const arr = JSON.parse(txt);
-    if(!Array.isArray(arr)) throw new Error('Not an array');
-    saveWorkers(arr.map(x=>({ id: x.id||uid(), name:x.name||'Untitled', cat:x.cat||'Other', rate: Number(x.rate)||0, desc:x.desc||'', photo: x.photo||PLACEHOLDER_PHOTO })));
-    toast('Imported');
-  }catch(e){ alert('Invalid JSON'); }
-}
-
-/* ========== attach events ========== */
-window.addEventListener('load', ()=>{
-  renderWorkers();
-  $('addWorker').onclick = addWorkerHandler;
-  $('loadSample').onclick = loadSample;
-  $('clearAll').onclick = clearAll;
-  $('bookBtn').onclick = bookHandler;
-  $('exportBtn').onclick = exportJSON;
-  $('importBtn').onclick = importJSON;
-});
-
-/* attempt to auto-select first worker on click in list */
-document.addEventListener('click', function(e){
-  // nothing extra now
-});
-</script>
-</body>
-</html>
+const sampleWorkers = [ { id: 1, name: "Jagdish", cat: "Painter", rate: 369, desc: "Experienced painter", photo: null }, { id: 2, name: "Suresh", cat: "Plumber", rate: 299, desc: "Reliable plumber", photo: null }, { id: 3, name: "Radha", cat: "Housemaid", rate: 250, desc: "Trustworthy home help", photo: null }, ];
