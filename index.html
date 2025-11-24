@@ -1,360 +1,155 @@
-<!doctype html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>WorkerHire — Premium</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<!-- Tailwind CDN (for quick demo) -->
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  :root{
-    --bg:#f8fbff;--card:#ffffff;--accent:#0ea5e9;--muted:#6b7280;
-  }
-  body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f7fbff 0,#f2f9ff 100%);color:#0f172a;}
-  .glass{background:rgba(255,255,255,0.7);backdrop-filter:blur(6px);box-shadow:0 8px 24px rgba(15,23,42,0.06);}
-  .btn{display:inline-flex;align-items:center;gap:.6rem;padding:.55rem .9rem;border-radius:.6rem;font-weight:600;}
-  .btn-primary{background:var(--accent);color:white;box-shadow:0 6px 18px rgba(14,165,233,0.18);}
-  .btn-ghost{background:transparent;border:1px solid rgba(15,23,42,0.06);color:var(--accent);}
-  .skeleton{background:linear-gradient(90deg,#e9f3fb,#f7fbff,#e9f3fb);background-size:200% 100%;animation:shimmer 1.2s infinite}
-  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  .avatar{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#eef7fb;display:block}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:#0f172a;color:white;padding:.8rem 1rem;border-radius:10px;box-shadow:0 8px 24px rgba(2,6,23,0.3);display:none;z-index:60;}
-</style>
+  <meta charset="UTF-8" />
+  <title>WorkerHire – Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen">
 
-<!-- Header -->
-<header class="py-6 px-6">
-  <div class="max-w-4xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-lg bg-white flex items-center justify-center shadow">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M6 6v12" stroke="#0ea5e9" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </div>
-      <div>
-        <div class="text-xl font-bold">WorkerHire</div>
-        <div class="text-sm text-gray-500">Premium — Blue theme</div>
-      </div>
-    </div>
+<body class="bg-[#eef3ff] text-gray-800">
 
-    <div class="flex items-center gap-3">
-      <button id="btnShowCustomer" class="btn btn-ghost">Hire a Worker</button>
-      <button id="btnShowWorker" class="btn btn-ghost">Earn Money</button>
-      <button id="authBtn" class="btn btn-primary">Login</button>
-    </div>
-  </div>
-</header>
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-xl">
 
-<main class="max-w-5xl mx-auto px-6 pb-20">
+  <h1 class="text-3xl font-bold text-blue-700 mb-4">WorkerHire Premium</h1>
 
-  <!-- hero -->
-  <section class="glass p-6 rounded-2xl mb-6">
-    <div class="flex items-center gap-6">
-      <div class="flex-1">
-        <h1 class="text-3xl md:text-4xl font-extrabold">Find trusted help — or earn by working</h1>
-        <p class="text-gray-500 mt-2">Fast booking | Worker photos | Smooth UI | Demo Razorpay integration</p>
-        <div class="mt-4 flex gap-3">
-          <button id="heroHire" class="btn btn-primary">Hire Now</button>
-          <button id="heroEarn" class="btn btn-ghost">Start Earning</button>
-        </div>
-      </div>
-      <div style="width:240px" class="hidden md:block">
-        <img src="https://images.unsplash.com/photo-1542744094-24638eff58bb?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2ab0c1a1e2a0ff6c2e60" class="rounded-xl shadow" alt="hero">
-      </div>
-    </div>
-  </section>
-
-  <!-- layout -->
-  <div id="app" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-    <!-- left: available workers -->
-    <div class="md:col-span-2">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold">Available Workers</h2>
-        <div class="text-sm text-gray-500">Select a worker and set hours</div>
-      </div>
-
-      <div id="workersList" class="space-y-4">
-        <!-- skeleton shown while loading -->
-        <div class="p-4 glass rounded-lg skeleton" style="height:120px;"></div>
-        <div class="p-4 glass rounded-lg skeleton" style="height:120px;"></div>
-      </div>
-    </div>
-
-    <!-- right: quick booking & manage -->
-    <aside class="glass p-4 rounded-xl">
-      <div class="mb-4">
-        <h3 class="font-semibold">Quick Booking</h3>
-        <div class="text-sm text-gray-500">Pick worker & hours</div>
-      </div>
-
-      <div class="mb-3">
-        <label class="text-sm text-gray-600">Select Worker</label>
-        <select id="selectWorker" class="w-full border px-3 py-2 rounded mt-2"></select>
-      </div>
-
-      <div class="mb-3">
-        <label class="text-sm text-gray-600">Hours</label>
-        <input id="hours" type="number" min="1" value="1" class="w-full border px-3 py-2 rounded mt-2" />
-      </div>
-
-      <div class="flex gap-2">
-        <button id="bookBtn" class="btn btn-primary w-full">Book & Pay</button>
-        <button id="demoBtn" class="btn btn-ghost w-full">Demo</button>
-      </div>
-
-      <hr class="my-4" />
-      <div>
-        <h4 class="font-semibold">Manage</h4>
-        <div class="mt-2 text-sm text-gray-500">Export / Import worker data</div>
-        <div class="mt-3 flex gap-2">
-          <button id="exportBtn" class="btn btn-ghost w-full">Export</button>
-          <button id="importBtn" class="btn btn-ghost w-full">Import</button>
-        </div>
-      </div>
-      <div class="mt-4">
-        <div class="text-xs text-gray-400">Live URL:</div>
-        <div id="liveUrl" class="text-sm text-indigo-600 break-all">Not deployed</div>
-      </div>
-    </aside>
+  <!-- Switch -->
+  <div class="flex space-x-3">
+    <button onclick="setView('customer')" id="btnCustomer" class="px-4 py-2 bg-blue-700 text-white rounded-xl">
+      Customer
+    </button>
+    <button onclick="setView('worker')" id="btnWorker" class="px-4 py-2 bg-gray-200 rounded-xl">
+      Worker
+    </button>
   </div>
 
-  <!-- dashboards (hidden unless login) -->
-  <div id="dashboards" class="mt-8" style="display:none">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="glass p-4 rounded-xl">
-        <h3 class="font-semibold">Customer Dashboard</h3>
-        <p class="text-sm text-gray-500">Bookings & history</p>
-        <div id="customerBookings" class="mt-3 space-y-2"></div>
-      </div>
+  <div id="content" class="mt-8"></div>
 
-      <div class="glass p-4 rounded-xl">
-        <h3 class="font-semibold">Worker Dashboard</h3>
-        <p class="text-sm text-gray-500">Your workers (manage photos & rates)</p>
-        <div id="workerManage" class="mt-3 space-y-3"></div>
-      </div>
-    </div>
-  </div>
-
-</main>
-
-<div id="toast" class="toast"></div>
-
-<!-- Razorpay SDK (will be used when backend available) -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</div>
 
 <script>
-/* =================== CONFIG =================== */
-const BACKEND_URL = ""; // set to your backend origin (e.g., https://your-railway-app.up.railway.app)
-let RAZORPAY_KEY = ""; // optional: set if you want client-side calls to show key
+const BACKEND_URL = "https://workerhire-production-7363.up.railway.app";  
+// ↑ yahi tumhara backend URL hai
 
-/* ========== tiny helpers ========== */
-const $ = id => document.getElementById(id);
-const toast = (msg, t=2200) => {
-  const el = $('toast'); el.textContent = msg; el.style.display='block';
-  setTimeout(()=>el.style.display='none', t);
+const RAZORPAY_KEY = "rzp_live_RjGSirxUwgP8pU";  
+// ↑ apna real Razorpay key ID (public key) yahan dalna
+let view = "customer";
+let selectedWorker = null;
+let workers = [];
+let customer = null;
+
+// Load Workers
+async function loadWorkers() {
+  const res = await fetch(BACKEND_URL + "/workers");
+  workers = await res.json();
 }
 
-/* ========== local storage keys ========== */
-const STORAGE_KEY = 'workerhire_v2';
-const getWorkers = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-const saveWorkers = (list) => localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+// Render UI
+function setView(v) {
+  view = v;
+  document.getElementById("btnCustomer").className =
+    v === "customer" ? "px-4 py-2 bg-blue-700 text-white rounded-xl" : "px-4 py-2 bg-gray-200 rounded-xl";
 
-/* ========== demo data (will load on first run) ========== */
-const sampleWorkers = [
-  { id: 'w1', name:'Jagdish', cat:'Painter', rate:369, desc:'Experienced painter', photo:null },
-  { id: 'w2', name:'Rekha', cat:'Housemaid', rate:250, desc:'Reliable house help', photo:null },
-  { id: 'w3', name:'Ravi', cat:'Electrician', rate:450, desc:'Certified electrician', photo:null }
-];
+  document.getElementById("btnWorker").className =
+    v === "worker" ? "px-4 py-2 bg-blue-700 text-white rounded-xl" : "px-4 py-2 bg-gray-200 rounded-xl";
 
-/* ========== rendering ========== */
-function renderWorkersSkeleton() {
-  $('workersList').innerHTML = '<div class="p-4 glass rounded-lg skeleton" style="height:120px;"></div>';
-  $('selectWorker').innerHTML = '<option>Loading...</option>';
+  render();
 }
 
-function renderWorkers(){
-  const list = getWorkers();
-  const out = [];
-  const options = [];
-  list.forEach(w=>{
-    const photoEl = w.photo ? `<img src="${w.photo}" class="avatar mr-4" />` : `<div class="avatar mr-4 flex items-center justify-center text-gray-400">No Photo</div>`;
-    out.push(`<div class="glass p-4 rounded-lg flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        ${photoEl}
-        <div>
-          <div class="font-semibold">${w.name} <span class="text-sm text-gray-500">• ${w.cat}</span></div>
-          <div class="text-indigo-600 font-bold mt-1">₹${w.rate} <span class="text-gray-500 text-sm">/ hr</span></div>
-          <div class="text-sm text-gray-500 mt-1">${w.desc || ''}</div>
-        </div>
-      </div>
-      <div class="flex flex-col gap-2 items-end">
-        <button class="btn btn-primary" data-id="${w.id}" onclick="selectWorker('${w.id}')">Select</button>
-        <button class="btn btn-ghost text-sm" onclick="openDetails('${w.id}')">Details</button>
-      </div>
-    </div>`);
-    options.push(`<option value="${w.id}">${w.name} — ₹${w.rate}/hr — ${w.cat}</option>`);
-  });
-  $('workersList').innerHTML = out.join('') || '<div class="p-4 text-gray-500">No workers — add some from Worker Dashboard.</div>';
-  $('selectWorker').innerHTML = options.join('') || '<option value="">No workers</option>';
+function render() {
+  if (view === "customer") renderCustomer();
+  else renderWorker();
 }
 
-/* ========== simple login (demo only) ========== */
-let currentUser = null; // {role:'customer'|'worker', name:'...'}
+// CUSTOMER UI
+function renderCustomer() {
+  let html = `
+  <h2 class="text-xl font-semibold text-blue-600">Quick Booking</h2>
+  <label class="block mt-4">Select Worker</label>
+  <select id="wk" class="w-full border p-2 rounded">
+    ${workers.map(w => `<option value="${w.id}">${w.name} (${w.rate}/hr)</option>`).join("")}
+  </select>
 
-function showAuth(){
-  const name = prompt('Name (use "worker:" prefix for worker dashboard, e.g., worker:Ram or just Ram for customer)');
-  if(!name) return;
-  if(name.toLowerCase().startsWith('worker:')) {
-    currentUser = { role:'worker', name: name.split(':')[1] || 'Worker' };
-  } else {
-    currentUser = { role:'customer', name };
-  }
-  localStorage.setItem('wh_user', JSON.stringify(currentUser));
-  $('authBtn').textContent = 'Account';
-  showDashboards(true);
-  toast('Logged in as ' + currentUser.name);
+  <label class="block mt-4">Hours</label>
+  <input id="hrs" type="number" class="w-full border p-2 rounded" />
+
+  <button onclick="book()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-xl">Book & Pay</button>
+  `;
+  document.getElementById("content").innerHTML = html;
 }
 
-/* ========== dashboards ========== */
-function showDashboards(force=false){
-  const user = currentUser || JSON.parse(localStorage.getItem('wh_user')||'null');
-  if(!user && !force) return;
-  currentUser = user;
-  $('dashboards').style.display = 'block';
-  // customer bookings
-  const bookings = JSON.parse(localStorage.getItem('wh_bookings') || '[]');
-  const custDiv = $('customerBookings'); custDiv.innerHTML='';
-  bookings.forEach(b=>{
-    custDiv.innerHTML += `<div class="p-3 rounded-lg bg-white border"><div class="font-semibold">${b.workerName}</div><div class="text-sm text-gray-500">Hours: ${b.hours} — Amount: ₹${b.amount.toFixed(2)}</div></div>`;
-  });
-  // worker manage
-  const wdiv = $('workerManage'); wdiv.innerHTML='';
-  if(user.role === 'worker'){
-    // show only worker's name placeholder
-    wdiv.innerHTML = `<div class="text-sm text-gray-500">Welcome, ${user.name}. Add / manage your workers below (demo)</div>`;
-  } else {
-    wdiv.innerHTML = `<div class="text-sm text-gray-500">You are a customer. To manage workers create an account as worker:</div>`;
-  }
-}
+// BOOKING FUNCTION
+async function book() {
+  const workerId = document.getElementById("wk").value;
+  const hours = Number(document.getElementById("hrs").value);
+  const worker = workers.find(x => x.id === workerId);
+  const amount = worker.rate * hours;
 
-/* ========== actions ========== */
-function selectWorker(id){
-  $('selectWorker').value = id; toast('Selected worker');
-}
-function openDetails(id){
-  const w = getWorkers().find(x=>x.id===id);
-  if(!w) return alert('Not found');
-  alert(`${w.name} — ${w.cat}\nRate: ₹${w.rate}/hr\n${w.desc || ''}`);
-}
+  const order = await fetch(BACKEND_URL + "/create-order", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ amount })
+  }).then(r => r.json());
 
-/* booking flow: calls backend /create-order if BACKEND_URL set, else demo alert */
-async function createOrder(amount) {
-  if(!BACKEND_URL) {
-    // demo mode
-    return { success:true, demo:true, id:'demo_'+Date.now() };
-  }
-  try {
-    const res = await fetch(BACKEND_URL + '/create-order', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify({ amount }) 
-    });
-    const data = await res.json();
-    return data;
-  } catch(e){ console.error(e); return { success:false, error:e.message }; }
-}
+  var options = {
+    key: RAZORPAY_KEY,
+    amount: amount * 100,
+    currency: "INR",
+    order_id: order.id,
+    handler: async function (resp) {
+      await fetch(BACKEND_URL + "/confirm-payment", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          workerId,
+          customerId: "demo-customer",
+          hours,
+          amount,
+          paymentId: resp.razorpay_payment_id
+        })
+      });
 
-async function bookAndPay(){
-  const wid = $('selectWorker').value;
-  const hours = Number($('hours').value || 1);
-  if(!wid) return toast('Choose a worker');
-  const w = getWorkers().find(x=>x.id===wid);
-  if(!w) return toast('Worker not found');
-  const amount = Number(w.rate) * hours;
-  $('bookBtn').disabled = true; $('bookBtn').textContent='Processing...';
-  const order = await createOrder(Math.round(amount*100)); // paise if used
-  $('bookBtn').disabled = false; $('bookBtn').textContent='Book & Pay';
-  if(!order.success) return alert('Order creation failed: ' + (order.error || 'unknown'));
-  if(order.demo) {
-    // demo success
-    const bookings = JSON.parse(localStorage.getItem('wh_bookings')||'[]');
-    bookings.push({ id:'b'+Date.now(), workerId: w.id, workerName: w.name, hours, amount });
-    localStorage.setItem('wh_bookings', JSON.stringify(bookings));
-    showDashboards(true);
-    return alert('Demo booking success. ' + w.name + ' booked for ' + hours + ' hour(s). Amount: ₹' + amount.toFixed(2));
-  }
-  // if backend returned razorpay order id and key, open checkout
-  const options = {
-    key: RAZORPAY_KEY || order.key,
-    amount: order.order.amount || Math.round(amount*100),
-    currency: order.order.currency || 'INR',
-    name: 'WorkerHire',
-    description: `Booking ${w.name}`,
-    order_id: order.order.id,
-    handler: function (response){
-      const bookings = JSON.parse(localStorage.getItem('wh_bookings')||'[]');
-      bookings.push({ id:response.razorpay_payment_id, workerId:w.id, workerName:w.name, hours, amount });
-      localStorage.setItem('wh_bookings', JSON.stringify(bookings));
-      showDashboards(true);
-      toast('Payment success');
-    },
-    modal: { esc:true }
+      alert("Booking Completed!");
+    }
   };
-  const rzp = new Razorpay(options);
-  rzp.open();
+  new Razorpay(options).open();
 }
 
-/* ========== manage workers quick UI (add demo / import export) ========== */
-function loadInitial(){
-  const current = getWorkers();
-  if(current.length===0){ saveWorkers(sampleWorkers); }
-}
-function exportWorkers(){
-  const data = JSON.stringify(getWorkers(), null, 2);
-  navigator.clipboard.writeText(data).then(()=>toast('Workers copied to clipboard'));
-}
-function importWorkers(){
-  const raw = prompt('Paste workers JSON'); if(!raw) return;
-  try{ const arr = JSON.parse(raw); saveWorkers(arr); renderWorkers(); toast('Imported'); } catch(e){ alert('Invalid JSON'); }
+// WORKER UI
+function renderWorker() {
+  let html = `
+  <h2 class="text-xl font-semibold text-blue-600">Add Worker</h2>
+
+  <input id="wname" placeholder="Name" class="w-full border p-2 rounded mt-3"/>
+  <input id="wcat" placeholder="Category" class="w-full border p-2 rounded mt-3"/>
+  <input id="wrate" placeholder="Rate/hr" type="number" class="w-full border p-2 rounded mt-3"/>
+  <input id="wdesc" placeholder="Description" class="w-full border p-2 rounded mt-3"/>
+
+  <button onclick="addWorker()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-xl">Add Worker</button>
+  `;
+  document.getElementById("content").innerHTML = html;
 }
 
-/* ========== small utility to add photo via prompt (demo) ========== */
-async function addPhotoToWorker(id){
-  const file = await new Promise(resolve=>{
-    const input = document.createElement('input'); input.type='file'; input.accept='image/*';
-    input.onchange = ()=>resolve(input.files[0]||null);
-    input.click();
+// ADD WORKER
+async function addWorker() {
+  const name = document.getElementById("wname").value;
+  const category = document.getElementById("wcat").value;
+  const rate = Number(document.getElementById("wrate").value);
+  const desc = document.getElementById("wdesc").value;
+
+  await fetch(BACKEND_URL + "/workers", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, category, rate, desc })
   });
-  if(!file) return;
-  const fr = new FileReader();
-  fr.onload = () => {
-    const list = getWorkers();
-    const w = list.find(x=>x.id===id); if(!w) return;
-    w.photo = fr.result;
-    saveWorkers(list); renderWorkers(); toast('Photo saved');
-  };
-  fr.readAsDataURL(file);
+
+  alert("Worker Added!");
+  loadWorkers();
 }
 
-/* UI wiring */
-$('heroHire').onclick = ()=>{$('btnShowCustomer').click();}
-$('heroEarn').onclick = ()=>{$('btnShowWorker').click();}
-$('btnShowCustomer').onclick = ()=>{ $('btnShowCustomer').classList.add('text-indigo-700'); $('btnShowWorker').classList.remove('text-indigo-700'); };
-$('btnShowWorker').onclick = ()=>{ $('btnShowWorker').classList.add('text-indigo-700'); $('btnShowCustomer').classList.remove('text-indigo-700'); };
-$('authBtn').onclick = ()=>{ showAuth(); }
-$('exportBtn').onclick = exportWorkers;
-$('importBtn').onclick = importWorkers;
-$('demoBtn').onclick = ()=>{ $('bookBtn').click(); };
-$('bookBtn').onclick = bookAndPay;
-
-/* initial load */
-renderWorkersSkeleton();
-setTimeout(()=>{ loadInitial(); renderWorkers(); showDashboards(); $('liveUrl').textContent = location.origin.replace(/^https?:/,''); }, 700);
-
-/* expose some functions to global for demo interactions */
-window.selectWorker = selectWorker;
-window.openDetails = openDetails;
-window.addPhotoToWorker = addPhotoToWorker;
+loadWorkers().then(render);
 </script>
+
 </body>
 </html>
